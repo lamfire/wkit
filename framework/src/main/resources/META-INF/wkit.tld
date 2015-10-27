@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE taglib PUBLIC  "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.2//EN"  
+    "http://java.sun.com/dtd/web-jsptaglibrary_1_2.dtd">  
+<taglib>  
+    <tlib-version>1.0</tlib-version>  
+    <jsp-version>1.1</jsp-version>  
+    <short-name>WkitTag</short-name>  
+    <uri>/wkit</uri>  
+      
+    <tag>  
+        <name>Paging</name>  
+        <tag-class>com.lamfire.wkit.paging.PagingTag</tag-class>
+        <body-content>empty</body-content>  
+        <attribute>  
+            <name>callback</name>  
+            <required>true</required>  
+        </attribute>
+        <attribute>  
+            <name>paging</name>  
+            <required>true</required>  
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>  
+            <name>titles</name>  
+            <required>false</required>  
+        </attribute>
+    </tag>  
+</taglib>  
