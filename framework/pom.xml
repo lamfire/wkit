@@ -77,4 +77,12 @@
             </plugin>
         </plugins>
     </build>
+
+    <distributionManagement>
+        <repository>
+            <id>lamfire</id>
+            <name>lamfire-respository</name>
+            <url>http://mvn.lamfire.com:8081/nexus/content/repositories/lamfire/</url>
+        </repository>
+    </distributionManagement>
 </project>
