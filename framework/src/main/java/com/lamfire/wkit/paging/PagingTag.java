@@ -4,10 +4,11 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
 
+import com.lamfire.logger.Logger;
 import com.lamfire.utils.StringUtils;
 
 public class PagingTag extends TagSupport {
-
+    private static final Logger LOGGER = Logger.getLogger(PagingTag.class);
 	private static final long serialVersionUID = 3086267641490020107L;
 	private static final String TAG_FORMAT = "<a href='javascript:%s(%d);' class='%s'>%s</a>";
 	private Paging paging;
@@ -54,6 +55,9 @@ public class PagingTag extends TagSupport {
 	public int doStartTag() throws JspException {
 		try {
 			if(paging.getPageCount() <= 1){
+                if(LOGGER.isDebugEnabled()){
+                    LOGGER.warn("paging total count = " + paging.getPageCount() +",skip write paging tag.");
+                }
 				return EVAL_PAGE;
 			}
 			
@@ -95,6 +99,7 @@ public class PagingTag extends TagSupport {
 			writer.println(getLastTag());
 			writer.println("<span>"+ (paging.getPageIndex()+1) + "/"+paging.getPageCount()+"(" + paging.getTotal()+")</span>");
 		} catch (Exception e) {
+            LOGGER.error(e.getMessage(),e);
 		}
 		return EVAL_PAGE;
 	}
