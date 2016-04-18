@@ -6,7 +6,7 @@ import com.lamfire.json.JSON;
 import com.lamfire.wkit.action.StreamAction;
 import com.lamfire.wkit.anno.ACTION;
 
-@ACTION(path = "/json.do")
+@ACTION(path = "/json1.do")
 public class JsonAction extends StreamAction{
 
 	private String username;

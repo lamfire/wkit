@@ -55,16 +55,10 @@ final class Dispatcher {
 		Action action = null;
 		try {
 			// init action
-            ActionRegistry registry = ActionRegistry.getInstance();
-			ActionMapper mapper = registry.lookup(servletPath);
+			ActionMapper mapper = getActionMapper(servletPath);
             if(mapper == null){
-                String className = ServletUtils.getActionClassName(actionRoot,servletPath);
-                Class<Action> clss =  ClassLoaderUtils.loadClass(className);
-                if(clss != null){
-                    mapper = registry.register(servletPath,clss);
-                }
+                throw new ActionException("Not found action : " + servletPath);
             }
-
 			action  = mapper.newAction(ac.getParameters());
 			action.init();
 			
@@ -79,6 +73,23 @@ final class Dispatcher {
 		}
 
 	}
+
+    private ActionMapper  getActionMapper(String servletPath){
+        ActionRegistry registry = ActionRegistry.getInstance();
+        ActionMapper mapper = registry.lookup(servletPath);
+        if(mapper == null){
+            try{
+                String className = ServletUtils.getActionClassName(actionRoot,servletPath);
+                Class<Action> clss =  ClassLoaderUtils.loadClass(className);
+                if(clss != null){
+                    mapper = registry.register(servletPath,clss);
+                }
+            }catch (Exception ex){
+                LOGGER.error("Action Not found : " + servletPath,ex);
+            }
+        }
+        return mapper;
+    }
 
 	private String getMultipartSaveDir(ServletContext servletContext) {
 		String saveDir = this.multipartSaveDir.trim();
