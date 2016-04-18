@@ -22,7 +22,7 @@ import com.lamfire.utils.StringUtils;
 @SuppressWarnings("unchecked")
 public final class ServletUtils {
 
-	static final Logger logger = Logger.getLogger(ServletUtils.class);
+	static final Logger LOGGER = Logger.getLogger(ServletUtils.class);
 
 	/**
 	 * 打印全部信息
@@ -56,7 +56,7 @@ public final class ServletUtils {
 			buffer.append("\n}");
 		}
 
-		logger.info(buffer.toString());
+        LOGGER.info(buffer.toString());
 	}
 
 	/**
@@ -74,7 +74,7 @@ public final class ServletUtils {
 			buffer.append(String.format("\n %16s : %s", name, StringUtils.join(val, ",")));
 		}
 		buffer.append("\n}");
-		logger.info(buffer.toString());
+        LOGGER.info(buffer.toString());
 	}
 
 	/**
@@ -93,7 +93,7 @@ public final class ServletUtils {
 		}
 		buffer.append("\n}");
 
-		logger.info(buffer.toString());
+        LOGGER.info(buffer.toString());
 	}
 
 	public static void printCookies(HttpServletRequest request) {
@@ -110,7 +110,7 @@ public final class ServletUtils {
 		}
 		buffer.append("\n}");
 
-		logger.info(buffer.toString());
+        LOGGER.info(buffer.toString());
 	}
 
 	/**
@@ -199,4 +199,46 @@ public final class ServletUtils {
 		}
 		return wkRequest.getRealRemoteAddr();
 	}
+
+    public static String getActionClassName(String actionRoot ,String servletPath) {
+        if (StringUtils.isBlank(servletPath)) {
+            return null;
+        }
+
+        try {
+            int index = servletPath.lastIndexOf("/");
+            int dotIndex = servletPath.lastIndexOf(".");
+            String actionName = servletPath.substring(index + 1);
+            if (dotIndex > 0) {
+                actionName = actionName.substring(0, actionName.lastIndexOf("."));
+            }
+
+            if (StringUtils.isBlank(actionName)) {
+                return null;
+            }
+
+            String nameSpace = null;
+            if (servletPath.indexOf("/") != index) {
+                nameSpace = servletPath.substring(1, index);
+                nameSpace = nameSpace.replace('/', '.');
+            }
+
+            String simpleActionClassName = actionName.substring(0, 1).toUpperCase() + actionName.substring(1) + "Action";
+            StringBuilder builder = new StringBuilder();
+
+            if (actionRoot != null && !"".equals(actionRoot.trim())) {
+                builder.append(actionRoot.trim());
+                builder.append('.');
+            }
+            if (nameSpace != null && !"".equals(nameSpace.trim())) {
+                builder.append(nameSpace.trim());
+                builder.append('.');
+            }
+            builder.append(simpleActionClassName);
+            return builder.toString();
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(),e);
+        }
+        return null;
+    }
 }

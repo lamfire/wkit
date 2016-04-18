@@ -4,7 +4,9 @@ import java.io.OutputStream;
 
 import com.lamfire.json.JSON;
 import com.lamfire.wkit.action.StreamAction;
+import com.lamfire.wkit.anno.ACTION;
 
+@ACTION(path = "/json.do")
 public class JsonAction extends StreamAction{
 
 	private String username;

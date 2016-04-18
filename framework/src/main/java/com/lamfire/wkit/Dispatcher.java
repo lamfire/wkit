@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.lamfire.logger.Logger;
+import com.lamfire.utils.ClassLoaderUtils;
 import com.lamfire.wkit.action.Action;
 
 final class Dispatcher {
@@ -54,7 +55,16 @@ final class Dispatcher {
 		Action action = null;
 		try {
 			// init action
-			ActionMapper mapper = ActionMapper.getMapper(actionRoot, servletPath);
+            ActionRegistry registry = ActionRegistry.getInstance();
+			ActionMapper mapper = registry.lookup(servletPath);
+            if(mapper == null){
+                String className = ServletUtils.getActionClassName(actionRoot,servletPath);
+                Class<Action> clss =  ClassLoaderUtils.loadClass(className);
+                if(clss != null){
+                    mapper = registry.register(servletPath,clss);
+                }
+            }
+
 			action  = mapper.newAction(ac.getParameters());
 			action.init();
 			
@@ -68,15 +78,6 @@ final class Dispatcher {
 			}
 		}
 
-	}
-
-	protected Action getAction(String servletPath) throws ClassNotFoundException{
-		try {
-			ActionMapper mapper = ActionMapper.getMapper(actionRoot, servletPath);
-			return mapper.newAction();
-		} catch (Exception e) {
-			throw new ActionException("Action not found:" + servletPath);
-		}
 	}
 
 	private String getMultipartSaveDir(ServletContext servletContext) {
