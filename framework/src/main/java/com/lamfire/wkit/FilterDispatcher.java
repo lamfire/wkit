@@ -16,10 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.lamfire.logger.Logger;
-import com.lamfire.utils.ClassLoaderUtils;
-import com.lamfire.utils.FilenameUtils;
-import com.lamfire.utils.IOUtils;
-import com.lamfire.utils.StringUtils;
+import com.lamfire.utils.*;
 
 public class FilterDispatcher implements Filter {
 	private static final Logger logger = Logger.getLogger(FilterDispatcher.class);
@@ -130,9 +127,11 @@ public class FilterDispatcher implements Filter {
 			logger.error(e.getMessage());
 		}
 
+        boolean success = true;
 		try {
 			this.dispatcher.serviceAction(request,response,context);
 		}catch (Exception e) {
+            success = false;
 			logger.error(e.getMessage(),e);
 			if(this.debug){
 				writeDebugExceptionInfo(request,response,e);
@@ -141,8 +140,9 @@ public class FilterDispatcher implements Filter {
 		if(this.debug){
     		String addr = ActionContext.getActionContext().getRemoteAddress();
     		String servletPath = request.getServletPath();
-    		String debufMsg = String.format("'%s' from %s,execute's time consuming = %d",servletPath,addr,(System.currentTimeMillis() - startTime));
-    		logger.info(debufMsg);
+            String dateTime = DateFormatUtils.format(System.currentTimeMillis(),"yyyy-MM-dd hh:mm:ss");
+    		String debufMsg = String.format("[%s] %s %s %s %s",dateTime,addr,String.valueOf(success),String.valueOf(System.currentTimeMillis() - startTime),servletPath);
+    		logger.debug(debufMsg);
 		}
 	}
 	
