@@ -178,14 +178,7 @@ public class FilterDispatcher implements Filter {
 	}
 	
 	private void loadExceptionTemplate(){
-		try{
-			InputStream input = ClassLoaderUtils.getResourceAsStream("/src/main/java/wkit/debug", FilterDispatcher.class);
-			byte[] bytes = IOUtils.toByteArray(input);
-			IOUtils.closeQuietly(input);
-			this.exceptionTemplate = new String(bytes);
-		}catch(Exception e){
-			
-		}
+	    this.exceptionTemplate = ExceptionPageTemplate.TEMPLATE;
 	}
 
 	public void init(FilterConfig filterConfig) throws ServletException {
