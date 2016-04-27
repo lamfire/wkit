@@ -24,6 +24,7 @@ final class Dispatcher {
 	private String multipartSaveDir;
 	private long multipartLimitSize = 10000000;
 	private String actionRoot;
+    private boolean uriToActionClassMappingEnable = true;
 
 	public static Dispatcher getInstance() {
 		return (Dispatcher) dispacherInstance.get();
@@ -41,7 +42,15 @@ final class Dispatcher {
 		return actionContextInstance.get();
 	}
 
-	static ActionContext createActionContext(HttpServletRequest request, HttpServletResponse response, ServletContext context) {
+    public boolean isUriToActionClassMappingEnable() {
+        return uriToActionClassMappingEnable;
+    }
+
+    public void setUriToActionClassMappingEnable(boolean uriToActionClassMappingEnable) {
+        this.uriToActionClassMappingEnable = uriToActionClassMappingEnable;
+    }
+
+    static ActionContext createActionContext(HttpServletRequest request, HttpServletResponse response, ServletContext context) {
 		ActionContext ac = ActionContext.createActionContext(context, request, response);
 		setActionContext(ac);
 		return ac;
@@ -77,7 +86,7 @@ final class Dispatcher {
     private ActionMapper  getActionMapper(String servletPath){
         ActionRegistry registry = ActionRegistry.getInstance();
         ActionMapper mapper = registry.lookup(servletPath);
-        if(mapper == null){
+        if(mapper == null && uriToActionClassMappingEnable){
             try{
                 String className = ServletUtils.getActionClassName(actionRoot,servletPath);
                 Class<Action> clss =  ClassLoaderUtils.loadClass(className);

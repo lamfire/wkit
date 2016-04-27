@@ -8,6 +8,7 @@ class Config{
 	private String actionRoot ;
 	private String multipartTempDir = DEFAULT_MULTIPART_TEMPDIR;
 	private long multipartLimit = DEFAULT_MULTIPART_LIMIT;
+    private boolean uriToActionClassMappingEnable = true;
 	
 	public String getActionRoot() {
 		return actionRoot;
@@ -28,13 +29,21 @@ class Config{
 		this.multipartLimit = multipartLimit;
 	}
 
-	public String toString() {
-		StringBuffer buffer = new StringBuffer();
-		buffer.append("action.root=" + actionRoot);
-		buffer.append(",multipart.limit=" + multipartLimit);
-		buffer.append(",multipart.tempdir=" + multipartTempDir);
-		return buffer.toString();
-	}
-	
-	
+    public boolean isUriToActionClassMappingEnable() {
+        return uriToActionClassMappingEnable;
+    }
+
+    public void setUriToActionClassMappingEnable(boolean uriToActionClassMappingEnable) {
+        this.uriToActionClassMappingEnable = uriToActionClassMappingEnable;
+    }
+
+    @Override
+    public String toString() {
+        return "Config{" +
+                "actionRoot='" + actionRoot + '\'' +
+                ", multipartTempDir='" + multipartTempDir + '\'' +
+                ", multipartLimit=" + multipartLimit +
+                ", uriToActionClassMappingEnable=" + uriToActionClassMappingEnable +
+                '}';
+    }
 }

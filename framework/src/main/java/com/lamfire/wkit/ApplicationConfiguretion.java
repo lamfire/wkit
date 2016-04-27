@@ -16,6 +16,7 @@ final class ApplicationConfiguretion {
 	public static final String ACTION_ROOT = "action.root"; 
 	public static final String MULTIPART_TEMPDIR = "multipart.tempdir"; 
 	public static final String MULTIPART_LIMIT = "multipart.limit";
+    public static final String URI_TO_ACTION_CLASS_MAPPING = "uri.action.mapping";
 
 
 	private static Config conf;
@@ -30,6 +31,7 @@ final class ApplicationConfiguretion {
 		String actionRoot = prop.get(ACTION_ROOT);
 		String tempDir = prop.get(MULTIPART_TEMPDIR);
 		String maxSize = prop.get(MULTIPART_LIMIT);
+        String actionUriMapping = prop.get(URI_TO_ACTION_CLASS_MAPPING);
 
 		if (StringUtils.isBlank(actionRoot)) {
 			throw new RuntimeException("The application can not load config file:" + CONF_FILE);
@@ -52,6 +54,16 @@ final class ApplicationConfiguretion {
 			conf.setMultipartTempDir(tempDir.trim());
 		}
 
+        if(StringUtils.isNotBlank(actionUriMapping)){
+            try {
+                boolean mappingEnable = Boolean.valueOf(actionUriMapping);
+                conf.setUriToActionClassMappingEnable(mappingEnable);
+            } catch (Exception e) {
+                conf.setUriToActionClassMappingEnable(true);
+                LOGGER.warn("Parser init-parameter 'uri.action.mapping' from web.xml catch Exception,use default : true");
+            }
+        }
+
 		LOGGER.info("Load application configuration : " + conf);
 		return conf;
 
@@ -61,6 +73,7 @@ final class ApplicationConfiguretion {
 		String actionRoot = filterConfig.getInitParameter(ACTION_ROOT);
 		String tempDir = filterConfig.getInitParameter(MULTIPART_TEMPDIR);
 		String maxSize = filterConfig.getInitParameter(MULTIPART_LIMIT);
+        String actionUriMapping = filterConfig.getInitParameter(URI_TO_ACTION_CLASS_MAPPING);
 
 		if (StringUtils.isBlank(actionRoot)) {
 			return null;
@@ -82,6 +95,16 @@ final class ApplicationConfiguretion {
 		if (StringUtils.isNotBlank(tempDir)) {
 			conf.setMultipartTempDir(tempDir.trim());
 		}
+
+        if(StringUtils.isNotBlank(actionUriMapping)){
+            try {
+                boolean mappingEnable = Boolean.valueOf(actionUriMapping);
+                conf.setUriToActionClassMappingEnable(mappingEnable);
+            } catch (Exception e) {
+                conf.setUriToActionClassMappingEnable(true);
+                LOGGER.warn("Parser init-parameter 'uri.action.mapping' from web.xml catch Exception,use default : true");
+            }
+        }
 
 		LOGGER.info("Load application configuration : " + conf);
 		return conf;
