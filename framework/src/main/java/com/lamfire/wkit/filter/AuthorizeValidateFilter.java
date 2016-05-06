@@ -14,11 +14,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.lamfire.logger.Logger;
+import com.lamfire.utils.StringUtils;
 
 public class AuthorizeValidateFilter implements Filter{
 	static final Logger LOGGER = Logger.getLogger(AuthorizeValidateFilter.class);
-	private String key;
-	private String url;
+	private String sessionKey;
+	private String redirectUrl;
 	
 	public void destroy() {
 		
@@ -34,24 +35,31 @@ public class AuthorizeValidateFilter implements Filter{
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 		HttpServletRequest req = (HttpServletRequest)request;
 		HttpServletResponse res = (HttpServletResponse)response;
-		if(req.getSession().getAttribute(key) != null){
+
+        String uri = req.getRequestURI();
+        if(StringUtils.contains(uri,redirectUrl)){
+            chain.doFilter(request, response);
+            return;
+        }
+
+		if(req.getSession().getAttribute(sessionKey) != null){
 			chain.doFilter(request, response);
 			return;
 		}
 		
-		if(isExternalUrl(url)){
-			res.sendRedirect(url);
+		if(isExternalUrl(redirectUrl)){
+			res.sendRedirect(redirectUrl);
 			return;
 		}
 		
-		res.sendRedirect(req.getContextPath()+url);
+		res.sendRedirect(req.getContextPath()+redirectUrl);
 	}
 
 	public void init(FilterConfig filterConfig) throws ServletException {
-		this.key = filterConfig.getInitParameter("auth.key");
-		LOGGER.info("set 'auth.key':" + this.key);
+		this.sessionKey = filterConfig.getInitParameter("auth.session.key");
+		LOGGER.info("auth session key : " + this.sessionKey);
 		
-		this.url = filterConfig.getInitParameter("auth.url");
-		LOGGER.info("set 'auth.url':" + this.url);
+		this.redirectUrl = filterConfig.getInitParameter("auth.redirect.url");
+		LOGGER.info("auth redirect url : " + this.redirectUrl);
 	}
 }
