@@ -25,7 +25,6 @@ final class Dispatcher {
 	private String multipartSaveDir;
 	private long multipartLimitSize = 10000000;
 	private String actionRoot;
-    private boolean uriToActionClassMappingEnable = true;
 	private String permissionDeniedPage = "/permission_denied.jsp";
 
 	public static Dispatcher getInstance() {
@@ -43,14 +42,6 @@ final class Dispatcher {
 	public static ActionContext getActionContext() {
 		return actionContextInstance.get();
 	}
-
-    public boolean isUriToActionClassMappingEnable() {
-        return uriToActionClassMappingEnable;
-    }
-
-    public void setUriToActionClassMappingEnable(boolean uriToActionClassMappingEnable) {
-        this.uriToActionClassMappingEnable = uriToActionClassMappingEnable;
-    }
 
     static ActionContext createActionContext(HttpServletRequest request, HttpServletResponse response, ServletContext context) {
 		ActionContext ac = ActionContext.createActionContext(context, request, response);
@@ -106,17 +97,6 @@ final class Dispatcher {
     private ActionMapper  getActionMapper(String servletPath){
         ActionRegistry registry = ActionRegistry.getInstance();
         ActionMapper mapper = registry.lookup(servletPath);
-        if(mapper == null && uriToActionClassMappingEnable){
-            try{
-                String className = ServletUtils.getActionClassName(actionRoot,servletPath);
-                Class<Action> clss =  ClassLoaderUtils.loadClass(className);
-                if(clss != null){
-                    mapper = registry.register(servletPath,clss,null);
-                }
-            }catch (Exception ex){
-                LOGGER.error("Action Not found : " + servletPath,ex);
-            }
-        }
         return mapper;
     }
 

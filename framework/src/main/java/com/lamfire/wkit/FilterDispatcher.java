@@ -227,7 +227,6 @@ public class FilterDispatcher implements Filter {
 		this.dispatcher.setMultipartSaveDir(appConfig.getMultipartTempDir());
 		this.dispatcher.setDefaultEncoding(CHARSET);
 		this.dispatcher.setActionRoot(appConfig.getActionRoot());
-        this.dispatcher.setUriToActionClassMappingEnable(appConfig.isUriToActionClassMappingEnable());
 
 		if(StringUtils.isNotBlank(permissionDeniedPage)) {
 			this.dispatcher.setPermissionDeniedPage(permissionDeniedPage);
