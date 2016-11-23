@@ -2,6 +2,7 @@ package com.lamfire.wkit;
 
 import com.lamfire.logger.Logger;
 import com.lamfire.utils.ClassLoaderUtils;
+import com.lamfire.utils.StringUtils;
 import com.lamfire.wkit.action.Action;
 import com.lamfire.wkit.anno.ACTION;
 
@@ -55,16 +56,25 @@ public class ActionRegistry {
             return null;
         }
         String path = actionAnno.path();
-        return register(path,actionClass);
+        String annoPermissions = actionAnno.permissions();
+
+        String[] perminnions = null;
+        if(StringUtils.isNotBlank(annoPermissions)){
+            perminnions = StringUtils.split(annoPermissions,',');
+        }
+        return register(path,actionClass,perminnions);
     }
 
-    public synchronized ActionMapper register(String servletName ,Class<Action> actionClass){
+    public synchronized ActionMapper register(String servletName ,Class<Action> actionClass,String[] permissions){
         if(!Action.class.isAssignableFrom(actionClass)){
             return null;
         }
         ActionMapper mapper = new ActionMapper(servletName,actionClass);
+        if(permissions != null) {
+            mapper.addPermission(permissions);
+        }
         mappers.put(servletName, mapper);
-        LOGGER.debug("[register]" + servletName +" -> " + actionClass.getName());
+        LOGGER.debug("[ACTION]" + servletName +" -> " + actionClass.getName() + " >> " + StringUtils.join(permissions));
         return mapper;
     }
 

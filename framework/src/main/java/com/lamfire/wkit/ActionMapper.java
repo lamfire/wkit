@@ -4,7 +4,10 @@ import com.lamfire.logger.Logger;
 import com.lamfire.utils.ObjectFactory;
 import com.lamfire.wkit.action.Action;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 @SuppressWarnings("unchecked")
 public class ActionMapper {
@@ -13,6 +16,7 @@ public class ActionMapper {
 	private String servletPath;
 	private Class<Action> actionClass;
 	private ObjectFactory<Action> actionFactory;
+	private final Set<String> permissions = new HashSet<String>();
 
     public ActionMapper(String servletPath, Class<Action> actionClass) {
         this.servletPath = servletPath;
@@ -48,4 +52,19 @@ public class ActionMapper {
     public ObjectFactory<Action> getActionFactory() {
         return actionFactory;
     }
+
+
+	public void addPermission(String ... permissions){
+		for(String p : permissions) {
+			this.permissions.add(p);
+		}
+	}
+
+	public boolean isNonePermissionAuthorities(){
+		return this.permissions.isEmpty();
+	}
+
+	public Set<String> getPermissions() {
+		return permissions;
+	}
 }

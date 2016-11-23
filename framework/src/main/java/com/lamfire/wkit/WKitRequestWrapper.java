@@ -1,9 +1,11 @@
 package com.lamfire.wkit;
 
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import com.lamfire.logger.Logger;
 import com.lamfire.utils.ObjectUtils;
@@ -60,6 +62,13 @@ final class WKitRequestWrapper extends AbstractRequestWrapper {
 		}
 		return false;
 	}
-	
+
+	public Principal getUserPrincipal(){
+		HttpSession session =  getSession();
+		if(session == null){
+			return null;
+		}
+		return (Principal)session.getAttribute(ActionContext.USER_PRINCIPAL_IN_SESSION);
+	}
 	
 }

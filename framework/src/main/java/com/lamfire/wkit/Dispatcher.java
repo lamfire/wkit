@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.lamfire.logger.Logger;
 import com.lamfire.utils.ClassLoaderUtils;
 import com.lamfire.wkit.action.Action;
+import org.apache.commons.lang.StringUtils;
 
 final class Dispatcher {
 
@@ -25,6 +26,7 @@ final class Dispatcher {
 	private long multipartLimitSize = 10000000;
 	private String actionRoot;
     private boolean uriToActionClassMappingEnable = true;
+	private String permissionDeniedPage = "/permission_denied.jsp";
 
 	public static Dispatcher getInstance() {
 		return (Dispatcher) dispacherInstance.get();
@@ -56,6 +58,13 @@ final class Dispatcher {
 		return ac;
 	}
 
+	private void permissionDenied(ActionContext context,ActionMapper mapper){
+		HttpServletRequest request = context.getHttpServletRequest();
+		request.setAttribute("url",request.getServletPath());
+		request.setAttribute("permissions",StringUtils.join(mapper.getPermissions(),","));
+		context.forward(permissionDeniedPage);
+	}
+
 	public void serviceAction(HttpServletRequest request, HttpServletResponse response, ServletContext context) throws Exception{
 
 		String servletPath = request.getServletPath();
@@ -68,6 +77,17 @@ final class Dispatcher {
             if(mapper == null){
                 throw new ActionException("Not found action : " + servletPath);
             }
+			//permission
+			if(!mapper.isNonePermissionAuthorities()){
+				UserPrincipal u = ac.getUserPrincipal();
+				LOGGER.debug("[UserPrincipal] : " + u);
+				if(u == null || ! u.hashPermissions(mapper.getPermissions())){
+					//permission denied
+					permissionDenied(ac,mapper);
+					return;
+				}
+			}
+
 			action  = mapper.newAction(ac.getParameters());
 			action.init();
 			
@@ -91,7 +111,7 @@ final class Dispatcher {
                 String className = ServletUtils.getActionClassName(actionRoot,servletPath);
                 Class<Action> clss =  ClassLoaderUtils.loadClass(className);
                 if(clss != null){
-                    mapper = registry.register(servletPath,clss);
+                    mapper = registry.register(servletPath,clss,null);
                 }
             }catch (Exception ex){
                 LOGGER.error("Action Not found : " + servletPath,ex);
@@ -177,4 +197,7 @@ final class Dispatcher {
 		this.actionRoot = actionRoot;
 	}
 
+	public void setPermissionDeniedPage(String permissionDeniedPage) {
+		this.permissionDeniedPage = permissionDeniedPage;
+	}
 }

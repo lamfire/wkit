@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 public class ActionContext implements Serializable {
 	private static final long serialVersionUID = 3268310591678711007L;
+	public static final String USER_PRINCIPAL_IN_SESSION = "WKIT_SECURITY_CONTEXT";
 
 	static final ThreadLocal<ActionContext> actionContext = new ThreadLocal<ActionContext>();
 
@@ -202,5 +203,13 @@ public class ActionContext implements Serializable {
 
 	public InputStream getApplicationClassPathResourceAsStream(String name) {
 		return context.getResourceAsStream("/WEB-INF/classes/" + name);
+	}
+
+	public void setUserPrincipal(UserPrincipal principal){
+		getSession().put(USER_PRINCIPAL_IN_SESSION,principal);
+	}
+
+	public UserPrincipal getUserPrincipal(){
+		return (UserPrincipal)getSession().get(USER_PRINCIPAL_IN_SESSION);
 	}
 }

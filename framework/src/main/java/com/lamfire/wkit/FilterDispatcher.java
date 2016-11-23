@@ -24,6 +24,7 @@ public class FilterDispatcher implements Filter {
 	private static final String INIT_PATAMETER_DEBUG = "debug";
 	private static final String INIT_PATAMETER_EXCLUDE_SUFFIX = "exclude.suffixes";
 	private static final String INIT_PATAMETER_EXCLUDE_PATHS = "exclude.paths";
+	private static final String INIT_PATAMETER_PERMISSION_DENIED_PAGE = "permission.denied.page";
 	
 	private static final String[] DEFAULT_EXCLUDE_SUFFIXES = {"css","js","jpg","png","gif","jsp","ico"};
 	
@@ -214,6 +215,8 @@ public class FilterDispatcher implements Filter {
 			logger.info("exclude paths :" + paths);
 			excludePaths = StringUtils.split(paths, ',');
 		}
+
+		String permissionDeniedPage = this.filterConfig.getInitParameter(INIT_PATAMETER_PERMISSION_DENIED_PAGE);
 		
 		//init dispatcher
 		Config appConfig = ApplicationConfiguretion.getConfig(filterConfig);
@@ -223,6 +226,7 @@ public class FilterDispatcher implements Filter {
 		this.dispatcher.setDefaultEncoding(CHARSET);
 		this.dispatcher.setActionRoot(appConfig.getActionRoot());
         this.dispatcher.setUriToActionClassMappingEnable(appConfig.isUriToActionClassMappingEnable());
+		this.dispatcher.setPermissionDeniedPage(permissionDeniedPage);
 		Dispatcher.setInstance(this.dispatcher);
 		
 		//mapping package
