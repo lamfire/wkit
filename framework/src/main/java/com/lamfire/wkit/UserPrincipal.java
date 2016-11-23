@@ -35,14 +35,14 @@ public class UserPrincipal implements Principal {
         return permissions;
     }
 
-    public void addPermissions(String[] permissions){
-        for(String p : permissions){
+    public void addPermissions(String... userPermissions){
+        for(String p : userPermissions){
             this.permissions.add(p);
         }
     }
 
-    public void addPermissions(Collection<String> permissions) {
-        this.permissions.addAll(permissions);
+    public void addPermissions(Collection<String> userPermissions) {
+        this.permissions.addAll(userPermissions);
     }
 
     public boolean hashPermissions(String permission){
