@@ -70,5 +70,13 @@ final class WKitRequestWrapper extends AbstractRequestWrapper {
 		}
 		return (Principal)session.getAttribute(ActionContext.USER_PRINCIPAL_IN_SESSION);
 	}
-	
+
+	@Override
+	public String getRemoteUser() {
+		Principal p = getUserPrincipal();
+		if(p == null){
+			return null;
+		}
+		return p.getName();
+	}
 }

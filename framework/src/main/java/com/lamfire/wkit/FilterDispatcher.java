@@ -115,18 +115,20 @@ public class FilterDispatcher implements Filter {
 		HttpServletRequest request = (HttpServletRequest) req;
 		HttpServletResponse response = (HttpServletResponse) res;
 		ServletContext context = getServletContext();
-		
-		if(isExcludes(request)){
-			doChain(req, res,chain);
-			return;
-		}
-		
-		long startTime = System.currentTimeMillis();
+
+		//wrap request
 		try {
 			request = prepareDispatcherAndWrapRequest(request, response,context);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}
+		
+		if(isExcludes(request)){
+			doChain(request, res,chain);
+			return;
+		}
+		
+		long startTime = System.currentTimeMillis();
 
         boolean success = true;
 		try {
