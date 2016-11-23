@@ -52,6 +52,10 @@ public class UserPrincipal implements Principal {
         return permissions.contains(permission);
     }
 
+    public void clearPermissions(){
+        this.permissions.clear();
+    }
+
     public boolean hashPermissions(Collection<String> permissions){
         if(permissions == null){
             return true;

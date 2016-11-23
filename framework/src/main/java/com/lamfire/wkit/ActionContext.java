@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -205,8 +206,19 @@ public class ActionContext implements Serializable {
 		return context.getResourceAsStream("/WEB-INF/classes/" + name);
 	}
 
-	public void setUserPrincipal(UserPrincipal principal){
+	public void login(String username, Collection<String> permissions){
+		UserPrincipal principal = new UserPrincipal();
+		principal.setName(username);
+		principal.addPermissions(permissions);
+		login(principal);
+	}
+
+	public void login(UserPrincipal principal){
 		getSession().put(USER_PRINCIPAL_IN_SESSION,principal);
+	}
+
+	public void logout(){
+		getSession().clear();
 	}
 
 	public UserPrincipal getUserPrincipal(){

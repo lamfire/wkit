@@ -24,7 +24,7 @@ public class LoginAction extends ServletAction{
 			permissions.add("READ");
 			permissions.add("WRITE");
 			user.addPermissions(permissions);
-			getActionContext().setUserPrincipal(user);
+			getActionContext().login(user);
 
 			return redirect("/main.jsp");
 		}
