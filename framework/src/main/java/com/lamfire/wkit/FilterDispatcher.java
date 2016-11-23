@@ -228,7 +228,11 @@ public class FilterDispatcher implements Filter {
 		this.dispatcher.setDefaultEncoding(CHARSET);
 		this.dispatcher.setActionRoot(appConfig.getActionRoot());
         this.dispatcher.setUriToActionClassMappingEnable(appConfig.isUriToActionClassMappingEnable());
-		this.dispatcher.setPermissionDeniedPage(permissionDeniedPage);
+
+		if(StringUtils.isNotBlank(permissionDeniedPage)) {
+			this.dispatcher.setPermissionDeniedPage(permissionDeniedPage);
+		}
+
 		Dispatcher.setInstance(this.dispatcher);
 		
 		//mapping package
