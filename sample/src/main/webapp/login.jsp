@@ -25,7 +25,7 @@
 		</div>
 		<div id="loginBox" class="loginbox radius reflect gradient">
 			<h1>欢迎使用WKIT-DEMO</h1>
-		    <form id="loginForm" action="${pageContext.request.contextPath}/main.jsp">
+		    <form id="loginForm" action="${pageContext.request.contextPath}/login.do">
 		        <p>
 		            <label>账号：</label>
 		            <input type="text" name="username" placeholder="请输入您的账号" />
@@ -37,7 +37,7 @@
 		        <p>
 		            <label>验证码：</label>
 		            <input type="text" style="width:80px;" name="captcha" placeholder="验证码"/>
-		            <span><img src="${pageContext.request.contextPath}/captcha" /><a href="javascript:flushCaptcha();" title="看不清？">看不清？</a></span>
+		            <span><img src="${pageContext.request.contextPath}/captcha.do" /><a href="javascript:flushCaptcha();" title="看不清？">看不清？</a></span>
 		        </p>
 		        <p>
 		        	<label></label>
@@ -66,7 +66,7 @@
 })();
 
 function flushCaptcha(){
-	var url = "${pageContext.request.contextPath}/captcha?"+Math.random();
+	var url = "${pageContext.request.contextPath}/captcha.do?"+Math.random();
 	$("#captcha").attr("src",url);
 }
 </script>

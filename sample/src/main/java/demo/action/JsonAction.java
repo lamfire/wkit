@@ -6,7 +6,7 @@ import com.lamfire.json.JSON;
 import com.lamfire.wkit.action.StreamAction;
 import com.lamfire.wkit.anno.ACTION;
 
-@ACTION(path = "/json1.do")
+@ACTION(path = "/json.do",permissions = "WRITE")
 public class JsonAction extends StreamAction{
 
 	private String username;

@@ -21,6 +21,10 @@
 			<param-name>debug</param-name>
 			<param-value>true</param-value>
 		</init-param>
+		<init-param>
+			<param-name>permission.denied.page</param-name>
+			<param-value>/permission_denied.jsp</param-value>
+		</init-param>
         <init-param>
             <param-name>uri.action.mapping</param-name>
             <param-value>true</param-value>

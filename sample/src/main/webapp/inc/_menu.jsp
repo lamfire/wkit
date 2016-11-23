@@ -36,7 +36,7 @@
 					<a href="${pageContext.request.contextPath}/actions/stream.jsp">输出文件流</a>
 				</li>
 				<li>
-					<a href="${pageContext.request.contextPath}/actions/json.jsp">输出JSON数据</a>
+					<a href="${pageContext.request.contextPath}/actions/json.jsp">输出JSON数据[AUTH]</a>
 				</li>
 				<li>
 					<a href="${pageContext.request.contextPath}/paging.do">分页显示</a>
