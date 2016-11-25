@@ -7,13 +7,9 @@ import com.lamfire.wkit.Invocation;
 import com.lamfire.wkit.InvocationVisitor;
 
 
-public abstract class Action implements Invocation{
+public abstract class Action{
 	public void destroy() {
 
-	}
-	
-	public void accept(InvocationVisitor visitor) throws Exception {
-		visitor.visit(this);
 	}
 
 	public void init() {

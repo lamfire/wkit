@@ -11,9 +11,9 @@ import java.lang.annotation.*;
 @Documented
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)
-@Target( { java.lang.annotation.ElementType.TYPE })
-public @interface ACTION {
-    public abstract String path() default "";
+@Target( { ElementType.METHOD,ElementType.TYPE })
+public @interface MAPPING {
+    public abstract String path();
     public abstract String permissions() default "";
 }
 

@@ -5,7 +5,7 @@
 
     <artifactId>wkit</artifactId>
     <groupId>com.lamfire</groupId>
-    <version>2.0.1</version>
+    <version>2.0.2</version>
     <modelVersion>4.0.0</modelVersion>
 
     <dependencies>
@@ -43,7 +43,8 @@
         <dependency>
             <groupId>com.lamfire</groupId>
             <artifactId>lamfire</artifactId>
-            <version>2.3.18</version>
+            <version>2.3.21</version>
+            <type>jar</type>
         </dependency>
     </dependencies>
 

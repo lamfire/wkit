@@ -8,9 +8,7 @@ import com.lamfire.logger.Logger;
 
 public abstract class StreamAction extends Action{
 	final static Logger LOGGER = Logger.getLogger(StreamAction.class);
-	
-	public abstract void execute(OutputStream output);
-	
+
 	protected void write(OutputStream out , byte[] bytes){
 		try {
 			out.write(bytes);

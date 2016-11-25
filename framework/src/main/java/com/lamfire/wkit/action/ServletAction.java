@@ -4,8 +4,6 @@ import com.lamfire.wkit.ActionContext;
 
 
 public abstract class ServletAction extends Action{
-	
-	public abstract ActionForward execute( );
 
 	protected void setMessage(String message) {
 		ActionContext.getActionContext().getRequest().put("message", message);
@@ -15,12 +13,12 @@ public abstract class ServletAction extends Action{
 		ActionContext.getActionContext().getRequest().put("errorMessage", message);
 	}
 
-	protected ActionForward redirect(String url) {
-		return new ActionForward(url,true);
+	protected ActionResult redirect(String url) {
+		return new ActionResult(url,true);
 	}
 	
-	protected ActionForward forward(String url) {
-		return new ActionForward(url,false);
+	protected ActionResult forward(String url) {
+		return new ActionResult(url,false);
 	}
 	
 }

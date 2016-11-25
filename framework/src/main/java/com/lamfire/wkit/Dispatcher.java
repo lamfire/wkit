@@ -3,6 +3,7 @@ package com.lamfire.wkit;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Method;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -79,11 +80,12 @@ final class Dispatcher {
 				}
 			}
 
-			action  = mapper.newAction(ac.getParameters());
-			action.init();
+			action  = mapper.newAction();
+			Method method = mapper.getActionMethod();
+			Object[] params = mapper.buildParams(ac.getParameters(),request,response);
 			
 			// execute service
-			action.accept(visitor);
+			visitor.visit(action,method,params);
 		} catch (Exception e) {
 			throw e;
 		} finally {

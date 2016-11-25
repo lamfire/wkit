@@ -8,8 +8,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import com.lamfire.logger.Logger;
-import com.lamfire.utils.ObjectUtils;
-import com.lamfire.wkit.action.Action;
 
 final class WKitRequestWrapper extends AbstractRequestWrapper {
 	static final Logger LOGGER = Logger.getLogger(WKitRequestWrapper.class);
@@ -18,8 +16,6 @@ final class WKitRequestWrapper extends AbstractRequestWrapper {
 	public WKitRequestWrapper(HttpServletRequest request) {
 		super(request);
 	}
-
-	private Action action;
 
 	@Override
 	public Object getAttribute(String name) {
@@ -32,13 +28,7 @@ final class WKitRequestWrapper extends AbstractRequestWrapper {
 			return super.getAttribute(name);
 		}
 		
-		try {
-			value = ObjectUtils.getPropertyValue(action, name);
-			actionAttributes.put(name, value);
-			return value;
-		} catch (Exception e) {
-			return super.getAttribute(name);
-		}
+		return super.getAttribute(name);
 	}
 	
 	
@@ -51,8 +41,8 @@ final class WKitRequestWrapper extends AbstractRequestWrapper {
 
 
 
-	public void setAction(Action action) {
-		this.action = action;
+	void addAttributes(Map<String, Object> attrs) {
+		actionAttributes.putAll(attrs);
 	}
 
 	public boolean isMultipartRequest() {

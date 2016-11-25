@@ -1,13 +1,18 @@
 package demo.action;
 
-public class CaptchaAction extends com.lamfire.wkit.action.CaptchaAction{
+import com.lamfire.json.JSON;
+import com.lamfire.wkit.action.StreamAction;
+import com.lamfire.wkit.anno.ACTION;
+import com.lamfire.wkit.anno.MAPPING;
+import com.lamfire.wkit.anno.PARAM;
 
-	@Override
-	public void init() {
-		setBaseText("0123456789qwertyupasdfghjkmnbvcxz");
-		this.setHeight(36);
-		this.setWidth(80);
-	}
+import java.io.OutputStream;
 
-	
+@ACTION
+public class CaptchaAction extends com.lamfire.wkit.action.CaptchaAction {
+
+    @MAPPING(path = "/cap")
+    public void a(OutputStream output){
+        super.execute(output);
+    }
 }

@@ -2,10 +2,14 @@ package com.lamfire.wkit;
 
 import com.lamfire.logger.Logger;
 import com.lamfire.utils.ClassLoaderUtils;
+import com.lamfire.utils.ClassUtils;
 import com.lamfire.utils.StringUtils;
 import com.lamfire.wkit.action.Action;
 import com.lamfire.wkit.anno.ACTION;
+import com.lamfire.wkit.anno.MAPPING;
 
+import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -46,14 +50,14 @@ public class ActionRegistry {
         }
     }
 
-    public ActionMapper register(Class<Action> actionClass){
+    public void register(Class<Action> actionClass){
         if(!Action.class.isAssignableFrom(actionClass)){
-            return null;
+            return;
         }
         ACTION actionAnno = actionClass.getAnnotation(ACTION.class);
         if(actionAnno == null){
             LOGGER.warn("["+actionClass.getName() + "] is assignable from Action,but not found 'ACTOIN' annotation.");
-            return null;
+            return;
         }
         String path = actionAnno.path();
         String annoPermissions = actionAnno.permissions();
@@ -62,20 +66,39 @@ public class ActionRegistry {
         if(StringUtils.isNotBlank(annoPermissions)){
             perminnions = StringUtils.split(annoPermissions,',');
         }
-        return register(path,actionClass,perminnions);
+        register(path,actionClass,perminnions);
     }
 
-    public synchronized ActionMapper register(String servletName ,Class<Action> actionClass,String[] permissions){
+    public synchronized void register(String path ,Class<Action> actionClass,String[] permissions){
         if(!Action.class.isAssignableFrom(actionClass)){
-            return null;
+            return;
         }
-        ActionMapper mapper = new ActionMapper(servletName,actionClass);
-        if(permissions != null) {
-            mapper.addPermission(permissions);
+
+        if(StringUtils.equals("/",path)){
+            path ="";
         }
-        mappers.put(servletName, mapper);
-        LOGGER.debug("[ACTION]" + servletName +" -> " + actionClass.getName() + " >> " + StringUtils.join(permissions));
-        return mapper;
+
+        Collection<Method> methods = ClassUtils.getAllDeclaredMethodsByAnnotation(actionClass,MAPPING.class);
+        for(Method m : methods) {
+            MAPPING mapping = m.getAnnotation(MAPPING.class);
+            String uri = null;
+            if(StringUtils.isBlank(path) || StringUtils.equals("/",path)){
+                uri = mapping.path();
+            }else{
+                uri = path +"/" + mapping.path();
+            }
+
+            ActionMapper mapper = new ActionMapper(path, actionClass,m);
+            if (permissions != null) {
+                mapper.addPermission(permissions);
+            }
+            String annoPermissions = mapping.permissions();
+            if(StringUtils.isNotBlank(annoPermissions)){
+                mapper.addPermission(StringUtils.split(annoPermissions,','));
+            }
+            mappers.put(uri, mapper);
+            LOGGER.debug("[ACTION]" + uri + " -> " + actionClass.getName()+"."+m.getName() + " >> " + StringUtils.join(mapper.getPermissions(),','));
+        }
     }
 
 

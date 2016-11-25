@@ -14,7 +14,10 @@ import javax.servlet.http.HttpServletResponse;
 import com.lamfire.utils.StringUtils;
 import com.lamfire.wkit.ActionContext;
 import com.lamfire.wkit.action.StreamAction;
+import com.lamfire.wkit.anno.ACTION;
+import com.lamfire.wkit.anno.MAPPING;
 
+@ACTION
 public class CaptchaAction extends StreamAction {
 
 	public static String SESSION_KEY = "_CAPTCHA_";
@@ -65,6 +68,7 @@ public class CaptchaAction extends StreamAction {
 		response.setDateHeader("Expires", 0);
 	}
 
+	@MAPPING(path = "/captcha")
 	public void execute(OutputStream output) {
 		// 设置页面不缓存
 		setResponseCache();
