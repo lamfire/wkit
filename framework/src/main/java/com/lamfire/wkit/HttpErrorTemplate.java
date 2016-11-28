@@ -26,7 +26,7 @@ public class HttpErrorTemplate {
             "</style>\n" +
             "</head>\n" +
             "<body>\n" +
-            "<h1>$s : %s</h1>\n" +
+            "<h1>%s : %s</h1>\n" +
             "<hr />\n" +
             "<pre>\n" +
             "%s\n" +
