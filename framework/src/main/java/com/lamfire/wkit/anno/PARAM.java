@@ -3,7 +3,7 @@ package com.lamfire.wkit.anno;
 import java.lang.annotation.*;
 
 /**
- * Parameter anno
+ * Action Method Parameter Mapping
  * User: linfan
  * Date: 16-4-18
  * Time: 下午5:07

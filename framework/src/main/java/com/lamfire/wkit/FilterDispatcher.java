@@ -26,7 +26,7 @@ public class FilterDispatcher implements Filter {
 	private static final String INIT_PATAMETER_EXCLUDE_PATHS = "exclude.paths";
 	private static final String INIT_PATAMETER_PERMISSION_DENIED_PAGE = "permission.denied.page";
 	
-	private static final String[] DEFAULT_EXCLUDE_SUFFIXES = {"css","js","jpg","png","gif","jsp","ico"};
+	private static final String[] DEFAULT_EXCLUDE_SUFFIXES = {"css","js","jpg","png","gif","ico"};
 	
 	private static String[] excludeSuffixes;
 	private static String[] excludePaths;
@@ -108,6 +108,14 @@ public class FilterDispatcher implements Filter {
 		return false;
 	}
 
+	private boolean isJavaServerPageRequest(HttpServletRequest request) {
+		String servlet = request.getServletPath();
+		if (StringUtils.isEndWithIgnoreCase(servlet,".jsp") || StringUtils.contains(servlet,".jsp?")) {
+			return true;
+		}
+		return false;
+	}
+
 	/**
 	 * 令命转发
 	 */
@@ -122,9 +130,29 @@ public class FilterDispatcher implements Filter {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}
-		
+
+		//resource
 		if(isExcludes(request)){
 			doChain(request, res,chain);
+			return;
+		}
+
+		ActionContext actionContext = dispatcher.createActionContext(request, response, context);
+
+		//is jsp request
+		if(isJavaServerPageRequest(request)){
+			String servletPath = request.getServletPath();
+			ActionMapper mapper = ActionRegistry.getInstance().lookup(servletPath);
+			if(mapper == null){
+				doChain(request, res, chain);
+				return;
+			}
+
+			if(dispatcher.hasPermissions(actionContext,mapper)) {
+				doChain(request, res, chain);
+				return;
+			}
+			dispatcher.forwardPermissionDenied(actionContext,mapper);
 			return;
 		}
 		
@@ -132,7 +160,7 @@ public class FilterDispatcher implements Filter {
 
         boolean success = true;
 		try {
-			this.dispatcher.serviceAction(request,response,context);
+			this.dispatcher.serviceAction(actionContext);
 		}catch (Exception e) {
             success = false;
 			logger.error(e.getMessage(),e);

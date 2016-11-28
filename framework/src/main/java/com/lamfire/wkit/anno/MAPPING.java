@@ -3,7 +3,7 @@ package com.lamfire.wkit.anno;
 import java.lang.annotation.*;
 
 /**
- * Action anno
+ * Method URL Mapping
  * User: linfan
  * Date: 16-4-18
  * Time: 下午5:07
@@ -11,7 +11,7 @@ import java.lang.annotation.*;
 @Documented
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)
-@Target( { ElementType.METHOD,ElementType.TYPE })
+@Target( { ElementType.METHOD})
 public @interface MAPPING {
     public abstract String path();
     public abstract String permissions() default "";

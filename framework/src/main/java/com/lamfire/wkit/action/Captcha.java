@@ -13,12 +13,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.lamfire.utils.StringUtils;
 import com.lamfire.wkit.ActionContext;
-import com.lamfire.wkit.action.StreamAction;
-import com.lamfire.wkit.anno.ACTION;
-import com.lamfire.wkit.anno.MAPPING;
 
-@ACTION
-public class CaptchaAction extends StreamAction {
+public class Captcha {
 
 	public static String SESSION_KEY = "_CAPTCHA_";
 
@@ -68,12 +64,11 @@ public class CaptchaAction extends StreamAction {
 		response.setDateHeader("Expires", 0);
 	}
 
-	@MAPPING(path = "/captcha")
-	public void execute(OutputStream output) {
+	public void outputCaptcha(OutputStream output) {
 		// 设置页面不缓存
 		setResponseCache();
 
-		// 备选汉字的长度
+//		 备选汉字的长度
 		int length = baseText.length();
 
 		// 创建内存图像
@@ -170,7 +165,7 @@ public class CaptchaAction extends StreamAction {
 	}
 
 	public static void setFontTypes(String[] fontTypes) {
-		CaptchaAction.fontTypes = fontTypes;
+		Captcha.fontTypes = fontTypes;
 	}
 
 	public static String getBaseText() {
@@ -178,17 +173,10 @@ public class CaptchaAction extends StreamAction {
 	}
 
 	public static void setBaseText(String baseText) {
-		CaptchaAction.baseText = baseText;
+		Captcha.baseText = baseText;
 	}
 
-	public void destroy() {
-		
-	}
 
-	public void init() {
-		
-	}
-	
 	public static boolean validate(String input){
 		if(StringUtils.isBlank(input)){
 			return false;

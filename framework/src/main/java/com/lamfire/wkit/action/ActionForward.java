@@ -3,18 +3,18 @@ package com.lamfire.wkit.action;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ActionResult {
+public class ActionForward {
 	private String urlPath;
 	private boolean redirect = false;
 	private final Map<String,Object> attrs = new HashMap<String, Object>();
 	
-	public ActionResult(){}
+	public ActionForward(){}
 	
-	public ActionResult(String url){
+	public ActionForward(String url){
 		this.urlPath = url;
 	}
 	
-	public ActionResult(String url, boolean redirect){
+	public ActionForward(String url, boolean redirect){
 		this.urlPath = url;
 		this.redirect = redirect;
 	}

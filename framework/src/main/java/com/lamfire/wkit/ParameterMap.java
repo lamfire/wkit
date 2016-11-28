@@ -88,11 +88,11 @@ public final class ParameterMap extends AbstractMap<String, Object> implements S
 	}
 
 	public Object put(String key, Object value) {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("read only");
 	}
 
 	public Object remove(Object key) {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("read only");
 	}
 
 	class Entry implements Map.Entry<String, Object> {
@@ -125,7 +125,7 @@ public final class ParameterMap extends AbstractMap<String, Object> implements S
 		}
 
 		public Object setValue(Object obj) {
-			throw new UnsupportedOperationException();
+			throw new UnsupportedOperationException("read only");
 		}
 
 	}

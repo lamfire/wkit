@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.lamfire.logger.Logger;
-import com.lamfire.utils.ClassLoaderUtils;
 import com.lamfire.wkit.action.Action;
 import org.apache.commons.lang.StringUtils;
 
@@ -20,7 +19,7 @@ final class Dispatcher {
 
 	private static ThreadLocal<Dispatcher> dispacherInstance = new ThreadLocal<Dispatcher>();
 	private static ThreadLocal<ActionContext> actionContextInstance = new ThreadLocal<ActionContext>();
-	private static InvocationVisitor visitor = new InvocationVisitor();
+	private static final ActionMethodVisitor visitor = new ActionMethodVisitor();
 
 	private String defaultEncoding;
 	private String multipartSaveDir;
@@ -44,23 +43,43 @@ final class Dispatcher {
 		return actionContextInstance.get();
 	}
 
-    static ActionContext createActionContext(HttpServletRequest request, HttpServletResponse response, ServletContext context) {
+    static synchronized ActionContext createActionContext(HttpServletRequest request, HttpServletResponse response, ServletContext context) {
 		ActionContext ac = ActionContext.createActionContext(context, request, response);
 		setActionContext(ac);
 		return ac;
 	}
 
-	private void permissionDenied(ActionContext context,ActionMapper mapper){
+	void forwardPermissionDenied(ActionContext context,ActionMapper mapper){
 		HttpServletRequest request = context.getHttpServletRequest();
 		request.setAttribute("url",request.getServletPath());
 		request.setAttribute("permissions",StringUtils.join(mapper.getPermissions(),","));
 		context.forward(permissionDeniedPage);
 	}
 
-	public void serviceAction(HttpServletRequest request, HttpServletResponse response, ServletContext context) throws Exception{
+	boolean hasPermissions(ActionContext context,ActionMapper mapper){
+		//permission
+		if(!mapper.isNonePermissionAuthorities()){
+			UserPrincipal u = context.getUserPrincipal();
+			LOGGER.debug("[UserPrincipal] : " + u);
+			if(u == null || ! u.hashPermissions(mapper.getPermissions())){
+				return false;
+			}
+		}
 
-		String servletPath = request.getServletPath();
-		ActionContext ac = createActionContext(request, response, context);
+		return true;
+	}
+
+	boolean hasPermissions(ActionContext context,String servletPath){
+		ActionMapper mapper = ActionRegistry.getInstance().lookup(servletPath);
+		if(mapper == null){
+			return true;
+		}
+		return hasPermissions(context,mapper);
+	}
+
+	public void serviceAction(ActionContext context) throws Exception{
+
+		String servletPath = context.getHttpServletRequest().getServletPath();
 
 		Action action = null;
 		try {
@@ -69,20 +88,17 @@ final class Dispatcher {
             if(mapper == null){
                 throw new ActionException("Not found action : " + servletPath);
             }
+
 			//permission
-			if(!mapper.isNonePermissionAuthorities()){
-				UserPrincipal u = ac.getUserPrincipal();
-				LOGGER.debug("[UserPrincipal] : " + u);
-				if(u == null || ! u.hashPermissions(mapper.getPermissions())){
-					//permission denied
-					permissionDenied(ac,mapper);
-					return;
-				}
+			if(!hasPermissions(context,mapper)){
+				//permission denied
+				forwardPermissionDenied(context,mapper);
+				return;
 			}
 
 			action  = mapper.newAction();
 			Method method = mapper.getActionMethod();
-			Object[] params = mapper.buildParams(ac.getParameters(),request,response);
+			Object[] params = mapper.resolveMethodArguments(context,context.getParameters());
 			
 			// execute service
 			visitor.visit(action,method,params);

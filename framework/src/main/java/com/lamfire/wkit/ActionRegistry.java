@@ -85,7 +85,7 @@ public class ActionRegistry {
             if(StringUtils.isBlank(path) || StringUtils.equals("/",path)){
                 uri = mapping.path();
             }else{
-                uri = path +"/" + mapping.path();
+                uri = path + mapping.path();
             }
 
             ActionMapper mapper = new ActionMapper(path, actionClass,m);
@@ -97,7 +97,7 @@ public class ActionRegistry {
                 mapper.addPermission(StringUtils.split(annoPermissions,','));
             }
             mappers.put(uri, mapper);
-            LOGGER.debug("[ACTION]" + uri + " -> " + actionClass.getName()+"."+m.getName() + " >> " + StringUtils.join(mapper.getPermissions(),','));
+            LOGGER.info("[ACTION]" + uri + " -> " + actionClass.getName()+"."+m.getName() + " >> " + StringUtils.join(mapper.getPermissions(),','));
         }
     }
 
