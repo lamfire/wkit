@@ -1,11 +1,15 @@
 package com.lamfire.wkit;
 
+import com.lamfire.logger.Logger;
+import com.lamfire.wkit.action.ErrorAction;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public class ActionContext implements Serializable {
+	private static final Logger LOGGER = Logger.getLogger(ActionContext.class);
 	private static final long serialVersionUID = 3268310591678711007L;
 	public static final String USER_PRINCIPAL_IN_SESSION = "WKIT_SECURITY_CONTEXT";
 
@@ -157,8 +162,24 @@ public class ActionContext implements Serializable {
 		try {
 			this.response.sendRedirect(request.getContextPath() + path);
 		} catch (IOException e) {
-			throw new ActionException(e);
+			LOGGER.error(e.getMessage(),e);
 		}
+	}
+
+	void handlePermissionDenied(Set<String> permissions){
+		ErrorAction error = ActionRegistry.getInstance().getErrorAction();
+		if(error == null){
+			error = new ErrorAction();
+		}
+		error.onPermissionDenied(this,request,response,this.getUserPrincipal(),permissions);
+	}
+
+	void handleActionException(Exception e){
+		ErrorAction error = ActionRegistry.getInstance().getErrorAction();
+		if(error == null){
+			error = new ErrorAction();
+		}
+		error.onActionException(this,request,response,e);
 	}
 
 	public void forward(String path) {
@@ -166,7 +187,7 @@ public class ActionContext implements Serializable {
 			RequestDispatcher dispatcher = request.getRequestDispatcher(path);
 			dispatcher.forward(request, response);
 		} catch (Exception e) {
-			throw new ActionException(e);
+			LOGGER.error(e.getMessage(),e);
 		}
 	}
 
@@ -174,7 +195,7 @@ public class ActionContext implements Serializable {
 		try {
 			this.response.sendRedirect(url);
 		} catch (IOException e) {
-			throw new ActionException(e);
+			LOGGER.error(e.getMessage(),e);
 		}
 	}
 

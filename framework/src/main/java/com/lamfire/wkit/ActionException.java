@@ -1,6 +1,6 @@
 package com.lamfire.wkit;
 
-public class ActionException extends RuntimeException {
+public class ActionException extends Exception {
 
 	private static final long serialVersionUID = -4528122654331517612L;
 

@@ -31,7 +31,7 @@ public class ActionMapper {
 		return argumentResolver.resolveArguments(context.getHttpServletRequest(),context.getHttpServletResponse(),parameters);
 	}
 
-    public Action newAction() throws ClassNotFoundException{
+    public Action newAction() throws ActionException{
 		if(actionFactory == null){
 			actionFactory = new ObjectFactory<Action>(actionClass);
 		}

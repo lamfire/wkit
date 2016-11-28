@@ -6,14 +6,6 @@ import com.lamfire.wkit.ActionContext;
 
 
 public abstract class Action{
-	public void destroy() {
-
-	}
-
-	public void init() {
-
-	}
-	
 	protected Map<String, Object> getSession(){
 		return ActionContext.getActionContext().getSession();
 	}

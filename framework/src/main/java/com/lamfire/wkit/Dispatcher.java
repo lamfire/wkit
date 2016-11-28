@@ -24,8 +24,6 @@ final class Dispatcher {
 	private String defaultEncoding;
 	private String multipartSaveDir;
 	private long multipartLimitSize = 10000000;
-	private String actionRoot;
-	private String permissionDeniedPage = "/permission_denied.jsp";
 
 	public static Dispatcher getInstance() {
 		return (Dispatcher) dispacherInstance.get();
@@ -49,11 +47,11 @@ final class Dispatcher {
 		return ac;
 	}
 
-	void forwardPermissionDenied(ActionContext context,ActionMapper mapper){
+	void throwPermissionDenied(ActionContext context,ActionMapper mapper)throws PermissionDeniedException{
 		HttpServletRequest request = context.getHttpServletRequest();
 		request.setAttribute("url",request.getServletPath());
 		request.setAttribute("permissions",StringUtils.join(mapper.getPermissions(),","));
-		context.forward(permissionDeniedPage);
+		throw new PermissionDeniedException(mapper.getPermissions());
 	}
 
 	boolean hasPermissions(ActionContext context,ActionMapper mapper){
@@ -77,7 +75,7 @@ final class Dispatcher {
 		return hasPermissions(context,mapper);
 	}
 
-	public void serviceAction(ActionContext context) throws Exception{
+	public void serviceAction(ActionContext context) throws ActionException, PermissionDeniedException {
 
 		String servletPath = context.getHttpServletRequest().getServletPath();
 
@@ -92,7 +90,7 @@ final class Dispatcher {
 			//permission
 			if(!hasPermissions(context,mapper)){
 				//permission denied
-				forwardPermissionDenied(context,mapper);
+				throwPermissionDenied(context,mapper);
 				return;
 			}
 
@@ -102,12 +100,10 @@ final class Dispatcher {
 			
 			// execute service
 			visitor.visit(action,method,params);
-		} catch (Exception e) {
-			throw e;
-		} finally {
-			if (action != null) {
-				action.destroy();
-			}
+		}catch (PermissionDeniedException pd){
+			throw pd;
+		}catch (Exception e) {
+			throw new ActionException(e);
 		}
 
 	}
@@ -191,11 +187,5 @@ final class Dispatcher {
 		this.defaultEncoding = defaultEncoding;
 	}
 
-	public void setActionRoot(String actionRoot) {
-		this.actionRoot = actionRoot;
-	}
 
-	public void setPermissionDeniedPage(String permissionDeniedPage) {
-		this.permissionDeniedPage = permissionDeniedPage;
-	}
 }

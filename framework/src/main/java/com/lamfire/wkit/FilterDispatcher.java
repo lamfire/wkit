@@ -1,8 +1,6 @@
 package com.lamfire.wkit;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.lamfire.logger.Logger;
 import com.lamfire.utils.*;
+import com.lamfire.wkit.action.ErrorAction;
 
 public class FilterDispatcher implements Filter {
 	private static final Logger logger = Logger.getLogger(FilterDispatcher.class);
@@ -25,8 +24,6 @@ public class FilterDispatcher implements Filter {
 	private static final String INIT_PATAMETER_DEBUG = "debug";
 	private static final String INIT_PATAMETER_EXCLUDE_SUFFIX = "exclude.suffixes";
 	private static final String INIT_PATAMETER_EXCLUDE_PATHS = "exclude.paths";
-	private static final String INIT_PATAMETER_PERMISSION_DENIED_PAGE = "permission.denied.page";
-	
 	private static final String[] DEFAULT_EXCLUDE_SUFFIXES = {"css","js","jpg","png","gif","ico"};
 	
 	private static final Set<String> ExcludeSuffixes = new HashSet<String>();
@@ -37,7 +34,6 @@ public class FilterDispatcher implements Filter {
 	
 	private Dispatcher dispatcher;
 	private boolean debug = false;
-	private String exceptionTemplate;
 
 	public void destroy() {
 		dispatcher = null;
@@ -140,7 +136,7 @@ public class FilterDispatcher implements Filter {
 				doChain(request, res, chain);
 				return;
 			}
-			dispatcher.forwardPermissionDenied(actionContext,mapper);
+			actionContext.handlePermissionDenied(mapper.getPermissions());
 			return;
 		}
 		
@@ -149,12 +145,15 @@ public class FilterDispatcher implements Filter {
         boolean success = true;
 		try {
 			this.dispatcher.serviceAction(actionContext);
-		}catch (Exception e) {
+		}
+		catch (PermissionDeniedException pe){
+			logger.error(pe.getMessage(),pe);
+			actionContext.handlePermissionDenied(pe.getPermissions());
+		}
+		catch (ActionException e) {
             success = false;
 			logger.error(e.getMessage(),e);
-			if(this.debug){
-				writeDebugExceptionInfo(request,response,e);
-			}
+			actionContext.handleActionException(e);
 		}
 		if(this.debug){
     		String addr = ActionContext.getActionContext().getRemoteAddress();
@@ -164,28 +163,7 @@ public class FilterDispatcher implements Filter {
 		}
 	}
 	
-	/**
-	 * 回写调试异常到页面
-	 * @param request
-	 * @param response
-	 * @param e
-	 */
-	private void writeDebugExceptionInfo(HttpServletRequest request,HttpServletResponse response,Exception e){
-		String servlet = request.getServletPath();
-		StringWriter writer = new StringWriter();  
-		PrintWriter print  = new PrintWriter(writer, true);
-		try{
-			e.printStackTrace(print);  
-	        String str = writer.toString();  
-			String info = String.format(exceptionTemplate, servlet,str,Version.VERSION);
-			response.getOutputStream().print(info);
-		}catch(Exception ex){
-			
-		}finally{
-			IOUtils.closeQuietly(print);
-			IOUtils.closeQuietly(writer);
-		}
-	}
+
 	
 	protected void doChain(ServletRequest req, ServletResponse res, FilterChain chain){
 		try {
@@ -193,10 +171,6 @@ public class FilterDispatcher implements Filter {
 		} catch (Exception e1) {
 			logger.error(e1.getMessage(),e1);
 		}
-	}
-	
-	private void loadExceptionTemplate(){
-	    this.exceptionTemplate = ExceptionPageTemplate.TEMPLATE;
 	}
 
 	public void init(FilterConfig filterConfig) throws ServletException {
@@ -214,9 +188,6 @@ public class FilterDispatcher implements Filter {
 		if(StringUtils.isNotBlank(debugVal)){
 			this.debug = Boolean.valueOf(debugVal);
 			logger.info("application run on debug molde :" + this.debug +"");
-			if(this.debug){
-				loadExceptionTemplate();
-			}
 		}
 		
 		//parameter exclude suffixes
@@ -235,20 +206,12 @@ public class FilterDispatcher implements Filter {
 			excludePaths = StringUtils.split(paths, ',');
 		}
 
-		String permissionDeniedPage = this.filterConfig.getInitParameter(INIT_PATAMETER_PERMISSION_DENIED_PAGE);
-		
 		//init dispatcher
 		Config appConfig = ApplicationConfiguretion.getConfig(filterConfig);
 		this.dispatcher = new Dispatcher();
 		this.dispatcher.setMultipartLimitSize(appConfig.getMultipartLimit());
 		this.dispatcher.setMultipartSaveDir(appConfig.getMultipartTempDir());
 		this.dispatcher.setDefaultEncoding(CHARSET);
-		this.dispatcher.setActionRoot(appConfig.getActionRoot());
-
-		if(StringUtils.isNotBlank(permissionDeniedPage)) {
-			this.dispatcher.setPermissionDeniedPage(permissionDeniedPage);
-		}
-
 		Dispatcher.setInstance(this.dispatcher);
 		
 		//mapping package

@@ -5,6 +5,7 @@ import com.lamfire.utils.ClassLoaderUtils;
 import com.lamfire.utils.ClassUtils;
 import com.lamfire.utils.StringUtils;
 import com.lamfire.wkit.action.Action;
+import com.lamfire.wkit.action.ErrorAction;
 import com.lamfire.wkit.anno.ACTION;
 import com.lamfire.wkit.anno.MAPPING;
 
@@ -25,6 +26,8 @@ public class ActionRegistry {
     private static final Logger LOGGER = Logger.getLogger(ActionRegistry.class);
     private final Map<String, ActionMapper> mappers = new HashMap<String, ActionMapper>();
 
+    private ErrorAction errorAction = new ErrorAction();
+
     private static final ActionRegistry  instance = new ActionRegistry();
 
     public static final ActionRegistry getInstance(){
@@ -40,6 +43,11 @@ public class ActionRegistry {
         Set<Class<?>> set = ClassLoaderUtils.getClasses(packageName);
         for(Class<?> clzz : set){
             if(!Action.class.isAssignableFrom(clzz)){
+                continue;
+            }
+            if(ErrorAction.class.isAssignableFrom(clzz)){
+                this.errorAction = (ErrorAction)clzz.newInstance();
+                LOGGER.info("[ErrorAction] : " + clzz.getName());
                 continue;
             }
             Class<Action> actionClass =  (Class<Action>)clzz;
@@ -106,4 +114,7 @@ public class ActionRegistry {
         return mappers.get(servletName);
     }
 
+    public ErrorAction getErrorAction() {
+        return errorAction;
+    }
 }
