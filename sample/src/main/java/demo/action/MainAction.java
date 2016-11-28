@@ -1,5 +1,6 @@
 package demo.action;
 
+import com.lamfire.json.JSON;
 import com.lamfire.utils.StringUtils;
 import com.lamfire.wkit.UserPrincipal;
 import com.lamfire.wkit.action.ActionForward;
@@ -30,7 +31,8 @@ public class MainAction extends ActionSupport {
     }
 
     @MAPPING(path = "/main.jsp",permissions = "ADMIN")
-    public ActionForward main(OutputStream output){
+    public ActionForward main(JSON json){
+        System.out.println(json);
        return forward("/main.jsp");
     }
 

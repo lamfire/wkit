@@ -75,33 +75,15 @@ final class Dispatcher {
 		return hasPermissions(context,mapper);
 	}
 
-	public void serviceAction(ActionContext context) throws ActionException, PermissionDeniedException {
-
-		String servletPath = context.getHttpServletRequest().getServletPath();
-
-		Action action = null;
+	public void serviceAction(ActionContext context,ActionMapper mapper) throws ActionException {
 		try {
-			// init action
-			ActionMapper mapper = getActionMapper(servletPath);
-            if(mapper == null){
-                throw new ActionException("Not found action : " + servletPath);
-            }
-
-			//permission
-			if(!hasPermissions(context,mapper)){
-				//permission denied
-				throwPermissionDenied(context,mapper);
-				return;
-			}
-
-			action  = mapper.newAction();
+			//create action
+			Action action  = mapper.newAction();
 			Method method = mapper.getActionMethod();
 			Object[] params = mapper.resolveMethodArguments(context,context.getParameters());
 			
 			// execute service
 			visitor.visit(action,method,params);
-		}catch (PermissionDeniedException pd){
-			throw pd;
 		}catch (Exception e) {
 			throw new ActionException(e);
 		}

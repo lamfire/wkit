@@ -16,7 +16,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.lamfire.logger.Logger;
 import com.lamfire.utils.*;
-import com.lamfire.wkit.action.ErrorAction;
 
 public class FilterDispatcher implements Filter {
 	private static final Logger logger = Logger.getLogger(FilterDispatcher.class);
@@ -125,17 +124,19 @@ public class FilterDispatcher implements Filter {
 		//create action context
 		ActionContext actionContext = dispatcher.createActionContext(request, response, context);
 
+		//check permission
+		if(!this.dispatcher.hasPermissions(actionContext,mapper)){
+			logger.error("permission denied : " + servletPath);
+			actionContext.handlePermissionDenied(mapper.getPermissions());
+			return;
+		}
+
 		//invoke action
 		long startTime = System.currentTimeMillis();
         boolean success = true;
 		try {
-			this.dispatcher.serviceAction(actionContext);
-		}
-		catch (PermissionDeniedException pe){
-			logger.error(pe.getMessage(),pe);
-			actionContext.handlePermissionDenied(pe.getPermissions());
-		}
-		catch (ActionException e) {
+			this.dispatcher.serviceAction(actionContext,mapper);
+		}catch (ActionException e) {
             success = false;
 			logger.error(e.getMessage(),e);
 			actionContext.handleActionException(e);
