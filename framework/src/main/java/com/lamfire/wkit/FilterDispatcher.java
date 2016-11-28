@@ -106,6 +106,14 @@ public class FilterDispatcher implements Filter {
 		HttpServletRequest request = (HttpServletRequest) req;
 		HttpServletResponse response = (HttpServletResponse) res;
 		ServletContext context = getServletContext();
+		String servletPath = request.getServletPath();
+
+		//lookup mapper
+		ActionMapper mapper = ActionRegistry.getInstance().lookup(servletPath);
+		if(mapper == null){
+			doChain(request, res, chain);
+			return;
+		}
 
 		//wrap request
 		try {
@@ -114,34 +122,11 @@ public class FilterDispatcher implements Filter {
 			logger.error(e.getMessage());
 		}
 
-		String servletPath = request.getServletPath();
-
-		//resource
-		if(isExcludes(servletPath)){
-			doChain(request, res,chain);
-			return;
-		}
-
+		//create action context
 		ActionContext actionContext = dispatcher.createActionContext(request, response, context);
 
-		//is jsp request
-		if(isJavaServerPageRequest(request)){
-			ActionMapper mapper = ActionRegistry.getInstance().lookup(servletPath);
-			if(mapper == null){
-				doChain(request, res, chain);
-				return;
-			}
-
-			if(dispatcher.hasPermissions(actionContext,mapper)) {
-				doChain(request, res, chain);
-				return;
-			}
-			actionContext.handlePermissionDenied(mapper.getPermissions());
-			return;
-		}
-		
+		//invoke action
 		long startTime = System.currentTimeMillis();
-
         boolean success = true;
 		try {
 			this.dispatcher.serviceAction(actionContext);
