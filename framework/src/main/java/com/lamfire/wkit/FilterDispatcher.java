@@ -124,6 +124,19 @@ public class FilterDispatcher implements Filter {
 		//create action context
 		ActionContext actionContext = dispatcher.createActionContext(request, response, context);
 
+
+		//authorized
+		if(!mapper.isNonePermissionAuthorities()){
+			String user = request.getRemoteUser();
+			if(user == null){
+				logger.error("Not Authorezed : " + servletPath);
+				actionContext.handleNotAuthorized();
+				return;
+			}
+		}
+
+
+
 		//check permission
 		if(!this.dispatcher.hasPermissions(actionContext,mapper)){
 			logger.error("permission denied : " + servletPath);

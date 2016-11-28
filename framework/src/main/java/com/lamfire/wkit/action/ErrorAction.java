@@ -27,4 +27,8 @@ public class ErrorAction extends Action {
         }
     }
 
+    public void onNotAuthorized(ActionContext context, HttpServletRequest request , HttpServletResponse response){
+        writeResponse(response,HttpErrorTemplate.getNotAuthrizedTemplate(request.getServletPath()));
+    }
+
 }

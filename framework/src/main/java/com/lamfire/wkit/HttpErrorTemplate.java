@@ -15,7 +15,7 @@ import java.util.Set;
  * To change this template use File | Settings | File Templates.
  */
 public class HttpErrorTemplate {
-    public static final String TEMPLATE_EXCEPTION = "<html>\n" +
+    public static final String TEMPLATE = "<html>\n" +
             "<head><title>Request Error report</title>\n" +
             "<style>\n" +
             "<!--\n" +
@@ -26,32 +26,10 @@ public class HttpErrorTemplate {
             "</style>\n" +
             "</head>\n" +
             "<body>\n" +
-            "<h1>Internal server error : %s</h1>\n" +
+            "<h1>$s : %s</h1>\n" +
             "<hr />\n" +
             "<pre>\n" +
             "%s\n" +
-            "</pre>\n" +
-            "<hr />\n" +
-            "<small>\n" +
-            "Wkit/%s\n" +
-            "</small>\n" +
-            "</body></html>";
-
-    public static final String TEMPLATE_PERMISSION_DENIED = "<html>\n" +
-            "<head><title>Request Error report</title>\n" +
-            "<style>\n" +
-            "<!--\n" +
-            "H1 {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;font-size:22px;height:48px;line-height:48px;} \n" +
-            "BODY {font-family:Tahoma,Arial,sans-serif;color:black;background-color:white;} \n" +
-            "HR {color : #525D76;}\n" +
-            "-->\n" +
-            "</style>\n" +
-            "</head>\n" +
-            "<body>\n" +
-            "<h1>Permission Denied : %s</h1>\n" +
-            "<hr />\n" +
-            "<pre>\n" +
-            "Need Permissions : %s\n" +
             "</pre>\n" +
             "<hr />\n" +
             "<small>\n" +
@@ -66,8 +44,8 @@ public class HttpErrorTemplate {
         PrintWriter print  = new PrintWriter(writer, true);
         try{
             e.printStackTrace(print);
-            String str = writer.toString();
-            result = String.format(TEMPLATE_EXCEPTION, servlet,str, Version.VERSION);
+            String body = writer.toString();
+            result = getTemplate("Http Server Internal Error",servlet,body);
             return result;
         }catch(Exception ex){
 
@@ -81,12 +59,28 @@ public class HttpErrorTemplate {
     public static String getPermissionDeniedTemplate(String servlet,Set<String> permissions){
         String result = null;
         try{
-            String str = StringUtils.join(permissions,',');
-            result = String.format(TEMPLATE_PERMISSION_DENIED, servlet,str, Version.VERSION);
+            String body = "Need Permissions : " + StringUtils.join(permissions,',');
+            result = getTemplate("Permission Denied",servlet,body);
             return result;
         }catch(Exception ex){
 
         }
         return result;
+    }
+
+    public static String getNotAuthrizedTemplate(String servlet){
+        String result = null;
+        try{
+            String body = "This request requires authorization to be accessed.";
+            result = getTemplate("Not Authrized",servlet,body);
+            return result;
+        }catch(Exception ex){
+
+        }
+        return result;
+    }
+
+    public static String getTemplate(String title,String url,String body){
+        return String.format(TEMPLATE,title,url,body,Version.VERSION);
     }
 }

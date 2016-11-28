@@ -182,6 +182,14 @@ public class ActionContext implements Serializable {
 		error.onActionException(this,request,response,e);
 	}
 
+	void handleNotAuthorized(){
+		ErrorAction error = ActionRegistry.getInstance().getErrorAction();
+		if(error == null){
+			error = new ErrorAction();
+		}
+		error.onNotAuthorized(this,request,response);
+	}
+
 	public void forward(String path) {
 		try {
 			RequestDispatcher dispatcher = request.getRequestDispatcher(path);
