@@ -1,9 +1,10 @@
 package com.lamfire.wkit;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -28,9 +29,9 @@ public class FilterDispatcher implements Filter {
 	
 	private static final String[] DEFAULT_EXCLUDE_SUFFIXES = {"css","js","jpg","png","gif","ico"};
 	
-	private static String[] excludeSuffixes;
+	private static final Set<String> ExcludeSuffixes = new HashSet<String>();
 	private static String[] excludePaths;
-	
+
 	private static String CHARSET = "utf-8";
 	private FilterConfig filterConfig;
 	
@@ -65,14 +66,21 @@ public class FilterDispatcher implements Filter {
 
 	/**
 	 * 请求是否在白名单内
-	 * @param request
+	 * @param servlet
 	 * @return
 	 */
-	private boolean isExcludes(HttpServletRequest request){
-		String servlet = request.getServletPath();
-		
+	private boolean isExcludes(String servlet){
 		//root
 		if(StringUtils.isBlank(servlet)){
+			return true;
+		}
+
+		//ExcludeSuffixes
+		String suffix = FilenameUtils.getExtension(servlet);
+		if(StringUtils.isBlank(suffix)){
+			return false;
+		}
+		if(ExcludeSuffixes.contains(suffix)){
 			return true;
 		}
 		
@@ -82,27 +90,6 @@ public class FilterDispatcher implements Filter {
 				if(servlet.startsWith(path)){
 					return true;
 				}
-			}
-		}
-		
-		//ExcludeSuffixes
-		String ext = FilenameUtils.getExtension(servlet);
-		if(StringUtils.isBlank(ext)){
-			return false;
-		}
-		//default
-		for(String suffix : DEFAULT_EXCLUDE_SUFFIXES){
-			if(suffix.equalsIgnoreCase(ext)){
-				return true;
-			}
-		}
-		//user extends
-		if(excludeSuffixes == null){
-			return false;
-		}
-		for(String suffix : excludeSuffixes){
-			if(suffix.equalsIgnoreCase(ext)){
-				return true;
 			}
 		}
 		return false;
@@ -131,8 +118,10 @@ public class FilterDispatcher implements Filter {
 			logger.error(e.getMessage());
 		}
 
+		String servletPath = request.getServletPath();
+
 		//resource
-		if(isExcludes(request)){
+		if(isExcludes(servletPath)){
 			doChain(request, res,chain);
 			return;
 		}
@@ -141,7 +130,6 @@ public class FilterDispatcher implements Filter {
 
 		//is jsp request
 		if(isJavaServerPageRequest(request)){
-			String servletPath = request.getServletPath();
 			ActionMapper mapper = ActionRegistry.getInstance().lookup(servletPath);
 			if(mapper == null){
 				doChain(request, res, chain);
@@ -170,7 +158,6 @@ public class FilterDispatcher implements Filter {
 		}
 		if(this.debug){
     		String addr = ActionContext.getActionContext().getRemoteAddress();
-    		String servletPath = request.getServletPath();
             String dateTime = DateFormatUtils.format(System.currentTimeMillis(),"yyyy-MM-dd hh:mm:ss");
     		String debufMsg = String.format("[%s] %s %s %s %s",dateTime,addr,String.valueOf(success),String.valueOf(System.currentTimeMillis() - startTime),servletPath);
     		logger.debug(debufMsg);
@@ -233,10 +220,12 @@ public class FilterDispatcher implements Filter {
 		}
 		
 		//parameter exclude suffixes
+		Sets.addAll(ExcludeSuffixes,DEFAULT_EXCLUDE_SUFFIXES);
 		String suffix = this.filterConfig.getInitParameter(INIT_PATAMETER_EXCLUDE_SUFFIX);
 		if(StringUtils.isNotBlank(suffix)){
 			logger.info("exclude suffixes :" + suffix);
-			excludeSuffixes = StringUtils.split(suffix, ',');
+			String[] excludeSuffixes = StringUtils.split(suffix, ',');
+			Sets.addAll(ExcludeSuffixes,excludeSuffixes);
 		}
 		
 		//parameter exclude paths
