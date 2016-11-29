@@ -72,7 +72,7 @@ public class UserPrincipal implements Principal {
     public String toString() {
         return "UserPrincipal{" +
                 "name='" + name + '\'' +
-                ", password='" + password + '\'' +
+                ", password='" + "***" + '\'' +
                 ", permissions=" + permissions +
                 '}';
     }
