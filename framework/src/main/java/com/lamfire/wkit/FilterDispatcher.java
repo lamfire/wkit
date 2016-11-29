@@ -21,18 +21,22 @@ public class FilterDispatcher implements Filter {
 	private static final Logger logger = Logger.getLogger(FilterDispatcher.class);
 	private static final String INIT_PATAMETER_CHARSET = "charset";
 	private static final String INIT_PATAMETER_DEBUG = "debug";
+	private static final String INIT_PATAMETER_REQUEST_AUTHENTICATED = "request.authenticated";
 	private static final String INIT_PATAMETER_EXCLUDE_SUFFIX = "exclude.suffixes";
 	private static final String INIT_PATAMETER_EXCLUDE_PATHS = "exclude.paths";
+	private static final String INIT_PATAMETER_AUTHORIZE_URL = "authorize.url";
 	private static final String[] DEFAULT_EXCLUDE_SUFFIXES = {"css","js","jpg","png","gif","ico"};
 	
 	private static final Set<String> ExcludeSuffixes = new HashSet<String>();
-	private static String[] excludePaths;
+	private static final Set<String> ExcludePaths = new HashSet<String>();
 
 	private static String CHARSET = "utf-8";
 	private FilterConfig filterConfig;
 	
 	private Dispatcher dispatcher;
 	private boolean debug = false;
+	private boolean requestAuthenticated = false;
+	private String authorizeUrl = "/login";
 
 	public void destroy() {
 		dispatcher = null;
@@ -72,21 +76,22 @@ public class FilterDispatcher implements Filter {
 
 		//ExcludeSuffixes
 		String suffix = FilenameUtils.getExtension(servlet);
-		if(StringUtils.isBlank(suffix)){
-			return false;
-		}
-		if(ExcludeSuffixes.contains(suffix)){
+		if(StringUtils.isNotBlank(suffix) && ExcludeSuffixes.contains(suffix)){
 			return true;
 		}
-		
+
 		//ExcludePaths
-		if(excludePaths != null){
-			for(String path : excludePaths){
-				if(servlet.startsWith(path)){
-					return true;
-				}
+		if(ExcludePaths.contains(servlet)){
+			return true;
+		}
+
+		//match path
+		for(String path : ExcludePaths){
+			if(servlet.startsWith(path)){
+				return true;
 			}
 		}
+
 		return false;
 	}
 
@@ -98,34 +103,37 @@ public class FilterDispatcher implements Filter {
 		return false;
 	}
 
-	/**
-	 * 令命转发
-	 */
-	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) {
-		HttpServletRequest request = (HttpServletRequest) req;
-		HttpServletResponse response = (HttpServletResponse) res;
-		ServletContext context = getServletContext();
+	public void service(HttpServletRequest request, HttpServletResponse response, FilterChain chain,ActionContext actionContext) throws ActionException {
 		String servletPath = request.getServletPath();
+		//excludes
+		if(isExcludes(servletPath)){
+			doChain(request, response, chain);
+			return;
+		}
+
+
+
+		//request authorized
+		if(requestAuthenticated && !StringUtils.equals(authorizeUrl,servletPath)){
+			String user = request.getRemoteUser();
+			if(user == null){
+				logger.error("Not Authorezed : " + servletPath);
+				actionContext.handleNotAuthorized();
+				return;
+			}
+		}
 
 		//lookup mapper
 		ActionMapper mapper = ActionRegistry.getInstance().lookup(servletPath);
 		if(mapper == null){
-			doChain(request, res, chain);
+			doChain(request, response, chain);
 			return;
 		}
 
-		//wrap request
-		try {
-			request = prepareDispatcherAndWrapRequest(request, response,context);
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-		}
-
-		//create action context
-		ActionContext actionContext = dispatcher.createActionContext(request, response, context);
 
 
-		//authorized
+
+		//mapping and authorized
 		if(!mapper.isNonePermissionAuthorities()){
 			String user = request.getRemoteUser();
 			if(user == null){
@@ -145,19 +153,45 @@ public class FilterDispatcher implements Filter {
 		}
 
 		//invoke action
-		long startTime = System.currentTimeMillis();
-        boolean success = true;
+
+		this.dispatcher.serviceAction(actionContext,mapper);
+
+	}
+
+	/**
+	 * 令命转发
+	 */
+	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) {
+		HttpServletRequest request = (HttpServletRequest) req;
+		HttpServletResponse response = (HttpServletResponse) res;
+		ServletContext context = getServletContext();
+
+
+		//wrap request
 		try {
-			this.dispatcher.serviceAction(actionContext,mapper);
+			request = prepareDispatcherAndWrapRequest(request, response,context);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+
+		long startTime = System.currentTimeMillis();
+		boolean success = true;
+
+		//create action context
+		ActionContext actionContext = dispatcher.createActionContext(request, response, getServletContext());
+
+		try {
+			service(request,response,chain,actionContext);
 		}catch (ActionException e) {
-            success = false;
+			success =false;
 			logger.error(e.getMessage(),e);
 			actionContext.handleActionException(e);
 		}
+
 		if(this.debug){
     		String addr = ActionContext.getActionContext().getRemoteAddress();
             String dateTime = DateFormatUtils.format(System.currentTimeMillis(),"yyyy-MM-dd hh:mm:ss");
-    		String debufMsg = String.format("[%s] %s %s %s %s",dateTime,addr,String.valueOf(success),String.valueOf(System.currentTimeMillis() - startTime),servletPath);
+    		String debufMsg = String.format("[%s] %s %s %s %s",dateTime,addr,String.valueOf(success),String.valueOf(System.currentTimeMillis() - startTime),request.getServletPath());
     		logger.debug(debufMsg);
 		}
 	}
@@ -188,6 +222,20 @@ public class FilterDispatcher implements Filter {
 			this.debug = Boolean.valueOf(debugVal);
 			logger.info("application run on debug molde :" + this.debug +"");
 		}
+
+		//request authenticated
+		String authenticatedVal = this.filterConfig.getInitParameter(INIT_PATAMETER_REQUEST_AUTHENTICATED);
+		if(StringUtils.isNotBlank(authenticatedVal)){
+			this.requestAuthenticated = Boolean.valueOf(authenticatedVal);
+			logger.info("http request authenticated :" + this.requestAuthenticated);
+		}
+
+		//authorizeUrl
+		String authUrlVal = this.filterConfig.getInitParameter(INIT_PATAMETER_AUTHORIZE_URL);
+		if(StringUtils.isNotBlank(authUrlVal)){
+			this.authorizeUrl = authUrlVal;
+			logger.info("authorize url :" + this.authorizeUrl);
+		}
 		
 		//parameter exclude suffixes
 		Sets.addAll(ExcludeSuffixes,DEFAULT_EXCLUDE_SUFFIXES);
@@ -202,7 +250,7 @@ public class FilterDispatcher implements Filter {
 		String paths = this.filterConfig.getInitParameter(INIT_PATAMETER_EXCLUDE_PATHS);
 		if(StringUtils.isNotBlank(paths)){
 			logger.info("exclude paths :" + paths);
-			excludePaths = StringUtils.split(paths, ',');
+			Sets.addAll(ExcludePaths,StringUtils.split(paths, ','));
 		}
 
 		//init dispatcher

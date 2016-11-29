@@ -2,6 +2,7 @@ package demo.action;
 
 import com.lamfire.json.JSON;
 import com.lamfire.utils.StringUtils;
+import com.lamfire.wkit.ActionContext;
 import com.lamfire.wkit.UserPrincipal;
 import com.lamfire.wkit.action.ActionForward;
 import com.lamfire.wkit.action.ActionSupport;
@@ -21,7 +22,7 @@ public class MainAction extends ActionSupport {
 
     @MAPPING(path = "/")
     public ActionForward index() {
-        return redirect("/login.jsp");
+        return redirect("/index.jsp");
     }
 
     @MAPPING(path = "/cap")
@@ -56,5 +57,10 @@ public class MainAction extends ActionSupport {
     }
 
 
+    @MAPPING(path = "/logout")
+    public ActionForward logout(ActionContext context) {
+        context.logout();
+        return redirect("/login.jsp");
+    }
 
 }

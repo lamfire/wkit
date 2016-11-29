@@ -42,7 +42,7 @@ public class MethodArgumentResolver {
         }
     }
 
-    public Object[] resolveArguments(HttpServletRequest request, HttpServletResponse response,Map<String,Object> requestParameters){
+    public Object[] resolveArguments(ActionContext context,HttpServletRequest request, HttpServletResponse response,Map<String,Object> requestParameters){
         Object[] args = new Object[methodParameters.length];
         for(int i=0;i<methodParameters.length;i++){
             String parameterName = methodParameters[i].getParameterName();
@@ -66,6 +66,11 @@ public class MethodArgumentResolver {
 
             if(HttpSession.class == type){
                 args[i] = request.getSession();
+                continue;
+            }
+
+            if(ActionContext.class == type){
+                args[i] = context;
                 continue;
             }
 

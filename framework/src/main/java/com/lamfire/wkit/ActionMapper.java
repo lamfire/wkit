@@ -28,7 +28,7 @@ public class ActionMapper {
     }
 
 	public Object[] resolveMethodArguments(ActionContext context,Map<String, Object> parameters){
-		return argumentResolver.resolveArguments(context.getHttpServletRequest(),context.getHttpServletResponse(),parameters);
+		return argumentResolver.resolveArguments(context,context.getHttpServletRequest(),context.getHttpServletResponse(),parameters);
 	}
 
     public Action newAction() throws ActionException{
