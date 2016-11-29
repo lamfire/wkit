@@ -6,6 +6,7 @@ import com.lamfire.utils.ClassUtils;
 import com.lamfire.utils.StringUtils;
 import com.lamfire.wkit.action.Action;
 import com.lamfire.wkit.action.ErrorAction;
+import com.lamfire.wkit.action.ErrorActionSupport;
 import com.lamfire.wkit.anno.ACTION;
 import com.lamfire.wkit.anno.MAPPING;
 
@@ -16,7 +17,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Created with IntelliJ IDEA.
+ * Action registry
  * User: linfan
  * Date: 16-4-18
  * Time: 下午5:05
@@ -26,7 +27,7 @@ public class ActionRegistry {
     private static final Logger LOGGER = Logger.getLogger(ActionRegistry.class);
     private final Map<String, ActionMapper> mappers = new HashMap<String, ActionMapper>();
 
-    private ErrorAction errorAction = new ErrorAction();
+    private ErrorAction errorAction = new ErrorActionSupport();
 
     private static final ActionRegistry  instance = new ActionRegistry();
 

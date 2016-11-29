@@ -2,6 +2,7 @@ package com.lamfire.wkit;
 
 import com.lamfire.logger.Logger;
 import com.lamfire.wkit.action.ErrorAction;
+import com.lamfire.wkit.action.ErrorActionSupport;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -169,7 +170,7 @@ public class ActionContext implements Serializable {
 	void handlePermissionDenied(Set<String> permissions){
 		ErrorAction error = ActionRegistry.getInstance().getErrorAction();
 		if(error == null){
-			error = new ErrorAction();
+			return;
 		}
 		error.onPermissionDenied(this,request,response,this.getUserPrincipal(),permissions);
 	}
@@ -177,7 +178,7 @@ public class ActionContext implements Serializable {
 	void handleActionException(Exception e){
 		ErrorAction error = ActionRegistry.getInstance().getErrorAction();
 		if(error == null){
-			error = new ErrorAction();
+			return;
 		}
 		error.onActionException(this,request,response,e);
 	}
@@ -185,7 +186,7 @@ public class ActionContext implements Serializable {
 	void handleNotAuthorized(){
 		ErrorAction error = ActionRegistry.getInstance().getErrorAction();
 		if(error == null){
-			error = new ErrorAction();
+			return;
 		}
 		error.onNotAuthorized(this,request,response);
 	}

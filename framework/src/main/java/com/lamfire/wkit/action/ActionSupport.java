@@ -5,9 +5,10 @@ import com.lamfire.wkit.ActionContext;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Map;
 
 
-public abstract class ActionSupport extends Action{
+public abstract class ActionSupport implements Action{
 	final static Logger LOGGER = Logger.getLogger(ActionSupport.class);
 
 	protected void setMessage(String message) {
@@ -50,5 +51,12 @@ public abstract class ActionSupport extends Action{
 			LOGGER.error(e);
 		}
 	}
-	
+
+	protected Map<String, Object> getSession(){
+		return ActionContext.getActionContext().getSession();
+	}
+
+	protected ActionContext getActionContext(){
+		return ActionContext.getActionContext();
+	}
 }
