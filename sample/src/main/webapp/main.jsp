@@ -22,5 +22,8 @@ Welcome [<a href="${pageContext.request.contextPath}/logout">${pageContext.reque
     </table>
 
 </form>
+<br>
+<p><a href="${pageContext.request.contextPath}/user/add">ADD</a></p>
+<p><a href="${pageContext.request.contextPath}/user/del">DEL</a></p>
 </body>
 </html>

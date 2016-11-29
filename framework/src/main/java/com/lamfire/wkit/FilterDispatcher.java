@@ -29,6 +29,7 @@ public class FilterDispatcher implements Filter {
 	
 	private static final Set<String> ExcludeSuffixes = new HashSet<String>();
 	private static final Set<String> ExcludePaths = new HashSet<String>();
+	private static final Set<String> ExcludePathStartWiths = new HashSet<String>();
 
 	private static String CHARSET = "utf-8";
 	private FilterConfig filterConfig;
@@ -86,7 +87,7 @@ public class FilterDispatcher implements Filter {
 		}
 
 		//match path
-		for(String path : ExcludePaths){
+		for(String path : ExcludePathStartWiths){
 			if(servlet.startsWith(path)){
 				return true;
 			}
@@ -247,10 +248,17 @@ public class FilterDispatcher implements Filter {
 		}
 		
 		//parameter exclude paths
-		String paths = this.filterConfig.getInitParameter(INIT_PATAMETER_EXCLUDE_PATHS);
-		if(StringUtils.isNotBlank(paths)){
-			logger.info("exclude paths :" + paths);
-			Sets.addAll(ExcludePaths,StringUtils.split(paths, ','));
+		String pathsVal = this.filterConfig.getInitParameter(INIT_PATAMETER_EXCLUDE_PATHS);
+		if(StringUtils.isNotBlank(pathsVal)){
+			logger.info("exclude paths :" + pathsVal);
+			String[] paths = StringUtils.split(pathsVal, ',');
+			for(String path : paths){
+				if(StringUtils.isEndWith(path,"/**")){
+					ExcludePathStartWiths.add(StringUtils.removeEnd(path,"**"));
+				}else{
+					ExcludePaths.add(path);
+				}
+			}
 		}
 
 		//init dispatcher
