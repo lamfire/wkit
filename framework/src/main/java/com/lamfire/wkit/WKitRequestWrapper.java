@@ -54,7 +54,7 @@ final class WKitRequestWrapper extends AbstractRequestWrapper {
 	}
 
 	public Principal getUserPrincipal(){
-		HttpSession session =  getSession();
+		HttpSession session =  getSession(false);
 		if(session == null){
 			return null;
 		}
