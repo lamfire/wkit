@@ -29,7 +29,6 @@ public class MethodArgumentResolver {
             mp.setMethod(method);
             mp.setIndex(i);
             mp.setParameterType(parameters[i].getType());
-            mp.setParameter(parameters[i]);
             mp.setParameterAnnotations(parameters[i].getAnnotations());
 
             PARAM p = parameters[i].getAnnotation(PARAM.class);

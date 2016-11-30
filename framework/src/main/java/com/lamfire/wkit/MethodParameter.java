@@ -2,17 +2,13 @@ package com.lamfire.wkit;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 
-/**
- * Created by lamfire on 16/11/28.
- */
+
 public class MethodParameter {
     private Method method;
     private int index;
     private Class<?> parameterType;
     private String parameterName;
-    private Parameter parameter;
     private Annotation[] parameterAnnotations;
 
     public Method getMethod() {
@@ -55,11 +51,4 @@ public class MethodParameter {
         this.parameterAnnotations = parameterAnnotations;
     }
 
-    public Parameter getParameter() {
-        return parameter;
-    }
-
-    public void setParameter(Parameter parameter) {
-        this.parameter = parameter;
-    }
 }

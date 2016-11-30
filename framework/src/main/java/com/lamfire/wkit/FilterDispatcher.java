@@ -209,6 +209,10 @@ public class FilterDispatcher implements Filter {
 
 	public void init(FilterConfig filterConfig) throws ServletException {
 		this.filterConfig = filterConfig;
+
+		if(!Version.getInstance().isJavaVersion("1.8")){
+			logger.error("[ERROR] : java version of the requirements 1.8.x");
+		}
 		
 		//parameter charset
 		String charset = this.filterConfig.getInitParameter(INIT_PATAMETER_CHARSET);
