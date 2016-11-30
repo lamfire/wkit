@@ -211,7 +211,7 @@ public class FilterDispatcher implements Filter {
 		this.filterConfig = filterConfig;
 
 		if(!Version.getInstance().isJavaVersion("1.8")){
-			logger.error("[ERROR] : java version of the requirements 1.8.x");
+			logger.error("[ERROR] : requirements java version 1.8.x");
 		}
 		
 		//parameter charset
