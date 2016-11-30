@@ -8,7 +8,7 @@ import com.lamfire.wkit.anno.MAPPING;
 
 import java.io.OutputStream;
 
-@ACTION(path = "/user",permissions = "ADMIN")
+@ACTION(path = "/user",permissions = "ADMIN",singleton = true)
 public class UserAction extends ActionSupport {
 
     @MAPPING(path = "/add")

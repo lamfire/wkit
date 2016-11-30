@@ -15,5 +15,6 @@ import java.lang.annotation.*;
 public @interface ACTION {
     public abstract String path() default "";
     public abstract String permissions() default "";
+    public abstract boolean singleton() default false;
 }
 

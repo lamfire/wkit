@@ -14,14 +14,14 @@ public class ActionMapper {
 	private String servletPath;
 	private Class<Action> actionClass;
 	private Method actionMethod;
-	private ObjectFactory<Action> actionFactory;
+	private ActionFactory actionFactory;
 	private final Set<String> permissions = new HashSet<String>();
 	private MethodArgumentResolver argumentResolver;
 
-    public ActionMapper(String servletPath, Class<Action> actionClass,Method actionMethod) {
+    public ActionMapper(ActionFactory actionFactory,String servletPath, Class<Action> actionClass,Method actionMethod) {
         this.servletPath = servletPath;
         this.actionClass = actionClass;
-        this.actionFactory = new ObjectFactory<Action>(actionClass);
+        this.actionFactory = actionFactory;
 		this.actionMethod = actionMethod;
 		this.argumentResolver = new MethodArgumentResolver(actionMethod);
 
@@ -32,11 +32,8 @@ public class ActionMapper {
 	}
 
     public Action newAction() throws ActionException{
-		if(actionFactory == null){
-			actionFactory = new ObjectFactory<Action>(actionClass);
-		}
 		try {
-			return actionFactory.newInstance();
+			return actionFactory.getActionInstance();
 		} catch (Exception e) {
 			throw new ActionException("Action not found:" +actionClass.getName());
 		}
@@ -53,11 +50,6 @@ public class ActionMapper {
     public Class<Action> getActionClass() {
         return actionClass;
     }
-
-    public ObjectFactory<Action> getActionFactory() {
-        return actionFactory;
-    }
-
 
 	public void addPermission(String ... permissions){
 		for(String p : permissions) {

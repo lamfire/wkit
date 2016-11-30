@@ -51,8 +51,6 @@ final class ApplicationConfiguretion {
 		if (StringUtils.isNotBlank(tempDir)) {
 			conf.setMultipartTempDir(tempDir.trim());
 		}
-
-		LOGGER.info("Load application configuration : " + conf);
 		return conf;
 
 	}
@@ -83,7 +81,6 @@ final class ApplicationConfiguretion {
 			conf.setMultipartTempDir(tempDir.trim());
 		}
 
-		LOGGER.info("Load application configuration : " + conf);
 		return conf;
 	}
 

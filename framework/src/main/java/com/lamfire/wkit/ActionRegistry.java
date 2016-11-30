@@ -48,7 +48,7 @@ public class ActionRegistry {
             }
             if(ErrorAction.class.isAssignableFrom(clzz)){
                 this.errorAction = (ErrorAction)clzz.newInstance();
-                LOGGER.info("[ErrorAction] : " + clzz.getName());
+                LOGGER.info("[ERROR_ACTION] : " + clzz.getName());
                 continue;
             }
             Class<Action> actionClass =  (Class<Action>)clzz;
@@ -75,10 +75,18 @@ public class ActionRegistry {
         if(StringUtils.isNotBlank(annoPermissions)){
             perminnions = StringUtils.split(annoPermissions,',');
         }
-        register(path,actionClass,perminnions);
+        ActionFactory factory;
+        if(actionAnno.singleton()){
+            factory = new SingletonInstanceActionFactory(actionClass);
+            LOGGER.info("[FOUND] singleton action : " + actionClass.getName());
+        }else{
+            factory = new CreateNewInstanceActionFactory(actionClass);
+            LOGGER.info("[FOUND] action : " + actionClass.getName());
+        }
+        register(path,actionClass,perminnions,factory);
     }
 
-    public synchronized void register(String path ,Class<Action> actionClass,String[] permissions){
+    public synchronized void register(String path ,Class<Action> actionClass,String[] permissions,ActionFactory factory){
         if(!Action.class.isAssignableFrom(actionClass)){
             return;
         }
@@ -97,7 +105,7 @@ public class ActionRegistry {
                 uri = path + mapping.path();
             }
 
-            ActionMapper mapper = new ActionMapper(path, actionClass,m);
+            ActionMapper mapper = new ActionMapper(factory,path, actionClass,m);
             if (permissions != null) {
                 mapper.addPermission(permissions);
             }
@@ -106,7 +114,7 @@ public class ActionRegistry {
                 mapper.addPermission(StringUtils.split(annoPermissions,','));
             }
             mappers.put(uri, mapper);
-            LOGGER.info("[ACTION]" + uri + " -> " + actionClass.getName()+"."+m.getName() + " >> " + StringUtils.join(mapper.getPermissions(),','));
+            LOGGER.info("[MAPPING]" + uri + " -> " + actionClass.getName()+"."+m.getName() + " >> " + StringUtils.join(mapper.getPermissions(),','));
         }
     }
 

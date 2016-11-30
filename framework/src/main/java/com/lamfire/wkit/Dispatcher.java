@@ -90,12 +90,6 @@ final class Dispatcher {
 
 	}
 
-    private ActionMapper  getActionMapper(String servletPath){
-        ActionRegistry registry = ActionRegistry.getInstance();
-        ActionMapper mapper = registry.lookup(servletPath);
-        return mapper;
-    }
-
 	private String getMultipartSaveDir(ServletContext servletContext) {
 		String saveDir = this.multipartSaveDir.trim();
 
