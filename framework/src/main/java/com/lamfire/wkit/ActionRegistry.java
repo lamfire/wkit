@@ -78,10 +78,10 @@ public class ActionRegistry {
         ActionFactory factory;
         if(actionAnno.singleton()){
             factory = new SingletonInstanceActionFactory(actionClass);
-            LOGGER.info("[FOUND] singleton action : " + actionClass.getName());
+            LOGGER.info("[FOUND] : " + actionClass.getName() +" - singleton" );
         }else{
             factory = new CreateNewInstanceActionFactory(actionClass);
-            LOGGER.info("[FOUND] action : " + actionClass.getName());
+            LOGGER.info("[FOUND] : " + actionClass.getName());
         }
         register(path,actionClass,perminnions,factory);
     }
@@ -114,7 +114,7 @@ public class ActionRegistry {
                 mapper.addPermission(StringUtils.split(annoPermissions,','));
             }
             mappers.put(uri, mapper);
-            LOGGER.info("[MAPPING]" + uri + " -> " + actionClass.getName()+"."+m.getName() + " >> " + StringUtils.join(mapper.getPermissions(),','));
+            LOGGER.info("[MAPPING] : " + uri + " -> " + actionClass.getName()+"."+m.getName() + " >> " + StringUtils.join(mapper.getPermissions(),','));
         }
     }
 
