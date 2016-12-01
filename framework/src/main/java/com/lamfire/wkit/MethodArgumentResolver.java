@@ -49,7 +49,14 @@ public class MethodArgumentResolver {
 
             if(StringUtils.isNotBlank(parameterName)){
                 Object val = requestParameters.get(parameterName);
-                args[i] = TypeConvertUtils.convert(val,type);
+                if(val == null){
+                    continue;
+                }
+                if(type.isInstance(val)){
+                    args[i] = val;
+                }else {
+                    args[i] = TypeConvertUtils.convert(val, type);
+                }
                 continue;
             }
 

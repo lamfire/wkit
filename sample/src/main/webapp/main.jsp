@@ -25,5 +25,11 @@ Welcome [<a href="${pageContext.request.contextPath}/logout">${pageContext.reque
 <br>
 <p><a href="${pageContext.request.contextPath}/user/add">ADD</a></p>
 <p><a href="${pageContext.request.contextPath}/user/del">DEL</a></p>
+<p>
+    <form method="post" action="${pageContext.request.contextPath}/file" enctype="multipart/form-data">
+        <input type="file" name="file">
+        <button type="submit">Submit</button>
+    </form>
+</p>
 </body>
 </html>
