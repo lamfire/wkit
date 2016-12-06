@@ -41,28 +41,35 @@ public class ActionRegistry {
 
     public void registerAll(String packageName){
         try{
-        Set<Class<?>> set = ClassLoaderUtils.getClasses(packageName);
-        for(Class<?> clzz : set){
-            if(!Action.class.isAssignableFrom(clzz)){
-                continue;
+            Set<Class<?>> set = ClassLoaderUtils.getClasses(packageName);
+            for(Class<?> clzz : set){
+                try {
+                    Class<Action> actionClass = (Class<Action>) clzz;
+                    register(actionClass);
+                }catch (Throwable t){
+                    LOGGER.warn(t.getMessage(),t);
+                }
             }
-            if(ErrorAction.class.isAssignableFrom(clzz)){
-                this.errorAction = (ErrorAction)clzz.newInstance();
-                LOGGER.info("[ERROR_ACTION] : " + clzz.getName());
-                continue;
-            }
-            Class<Action> actionClass =  (Class<Action>)clzz;
-            register(actionClass);
-        }
         }catch (Exception e){
             LOGGER.warn(e.getMessage(),e);
         }
     }
 
-    public void register(Class<Action> actionClass){
+    public void register(Class<Action> actionClass) throws MappingException {
         if(!Action.class.isAssignableFrom(actionClass)){
             return;
         }
+
+        if(ErrorAction.class.isAssignableFrom(actionClass)){
+            try {
+                this.errorAction = (ErrorAction) actionClass.newInstance();
+                LOGGER.info("[ERROR_ACTION] : " + actionClass.getName());
+            }catch (Exception e){
+                LOGGER.warn(e.getMessage(),e);
+            }
+            return;
+        }
+
         ACTION actionAnno = actionClass.getAnnotation(ACTION.class);
         if(actionAnno == null){
             LOGGER.warn("["+actionClass.getName() + "] is assignable from Action,but not found 'ACTOIN' annotation.");
@@ -86,10 +93,11 @@ public class ActionRegistry {
         register(path,actionClass,perminnions,factory);
     }
 
-    public synchronized void register(String path ,Class<Action> actionClass,String[] permissions,ActionFactory factory){
+    public synchronized void register(String path ,Class<Action> actionClass,String[] permissions,ActionFactory factory) throws MappingException {
         if(!Action.class.isAssignableFrom(actionClass)){
             return;
         }
+
 
         if(StringUtils.equals("/",path)){
             path ="";
@@ -103,6 +111,11 @@ public class ActionRegistry {
                 uri = mapping.path();
             }else{
                 uri = path + mapping.path();
+            }
+
+            if(mappers.containsKey(uri)){
+                ActionMapper mapper = mappers.get(uri);
+                throw new MappingException("Error create mapper["+uri+"] with class[" + actionClass.getName() +"],There is already defined in class '"+mapper.getActionClass().getName()+"'");
             }
 
             ActionMapper mapper = new ActionMapper(factory,path, actionClass,m);
