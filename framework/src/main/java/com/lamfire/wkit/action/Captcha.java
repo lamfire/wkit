@@ -6,6 +6,7 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Map;
 import java.util.Random;
 
 import javax.imageio.ImageIO;
@@ -37,7 +38,7 @@ public class Captcha {
 	private int minFontSize = 18;
 	
 	// 保存生成的汉字字符串
-	private String codeRand = "";
+	private String captchaCode = "";
 
 	// 设置图片的长宽
 	private int width = 120, height = 30;
@@ -58,6 +59,9 @@ public class Captcha {
 
 	void setResponseCache() {
 		HttpServletResponse response = ActionContext.getActionContext().getHttpServletResponse();
+		if(response == null){
+			return;
+		}
 		// 设置页面不缓存
 		response.setHeader("Pragma", "No-cache");
 		response.setHeader("Cache-Control", "no-cache");
@@ -102,7 +106,7 @@ public class Captcha {
 		for (int i = 0; i < this.fontCount; i++) {
 			int start = random.nextInt(length);
 			String rand = baseText.substring(start, start + 1);
-			codeRand += rand;
+			captchaCode += rand;
 
 			// 设置字体的颜色
 			g.setColor(getRandColor(10, 150));
@@ -117,7 +121,10 @@ public class Captcha {
 
 		// 将认证码存入session
 
-		ActionContext.getActionContext().getSession().put(SESSION_KEY, codeRand);
+		Map<String, Object> session= ActionContext.getActionContext().getSession();
+		if(session != null) {
+			session.put(SESSION_KEY, captchaCode);
+		}
 
 		g.dispose();
 
@@ -140,8 +147,8 @@ public class Captcha {
 		this.height = height;
 	}
 	
-	public String getRandomText(){
-		return codeRand;
+	public String getCaptchaCode(){
+		return captchaCode;
 	}
 
 	public void setMaxFontSize(int maxFontSize) {
@@ -181,7 +188,11 @@ public class Captcha {
 		if(StringUtils.isBlank(input)){
 			return false;
 		}
-		String sessionAt = (String)ActionContext.getInstance().getSession().get(SESSION_KEY);
+		Map<String, Object> session= ActionContext.getActionContext().getSession();
+		if(session == null){
+			return false;
+		}
+		String sessionAt = (String)session.get(SESSION_KEY);
 		return input.equalsIgnoreCase(sessionAt);
 	}
 }
