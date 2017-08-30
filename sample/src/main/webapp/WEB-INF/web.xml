@@ -31,7 +31,7 @@
 		</init-param>
 		<init-param>
 			<param-name>exclude.suffixes</param-name>
-			<param-value>zip,pdf,exe</param-value>
+			<param-value>css,js,png,jpg,zip,pdf,exe</param-value>
 		</init-param>
 		<init-param>
 			<param-name>exclude.paths</param-name>

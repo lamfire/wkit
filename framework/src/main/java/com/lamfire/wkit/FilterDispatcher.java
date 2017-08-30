@@ -25,7 +25,7 @@ public class FilterDispatcher implements Filter {
 	private static final String INIT_PATAMETER_EXCLUDE_SUFFIX = "exclude.suffixes";
 	private static final String INIT_PATAMETER_EXCLUDE_PATHS = "exclude.paths";
 	private static final String INIT_PATAMETER_AUTHORIZE_URL = "authorize.url";
-	private static final String[] DEFAULT_EXCLUDE_SUFFIXES = {"css","js","jpg","png","gif","ico"};
+	//private static final String[] DEFAULT_EXCLUDE_SUFFIXES = {"css","js","jpg","png","gif","ico"};
 	
 	private static final Set<String> ExcludeSuffixes = new HashSet<String>();
 	private static final Set<String> ExcludePaths = new HashSet<String>();
@@ -243,7 +243,7 @@ public class FilterDispatcher implements Filter {
 		}
 		
 		//parameter exclude suffixes
-		Sets.addAll(ExcludeSuffixes,DEFAULT_EXCLUDE_SUFFIXES);
+		//Sets.addAll(ExcludeSuffixes,DEFAULT_EXCLUDE_SUFFIXES);
 		String suffix = this.filterConfig.getInitParameter(INIT_PATAMETER_EXCLUDE_SUFFIX);
 		if(StringUtils.isNotBlank(suffix)){
 			logger.info("exclude suffixes :" + suffix);
