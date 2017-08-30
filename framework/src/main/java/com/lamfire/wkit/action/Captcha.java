@@ -68,7 +68,7 @@ public class Captcha {
 		response.setDateHeader("Expires", 0);
 	}
 
-	public void outputCaptcha(OutputStream output) {
+	public void write(OutputStream output) {
 		// 设置页面不缓存
 		setResponseCache();
 

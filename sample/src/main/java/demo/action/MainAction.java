@@ -28,7 +28,7 @@ public class MainAction extends ActionSupport {
     @MAPPING(path = "/cap")
     public void cap(OutputStream output){
         Captcha captcha = new Captcha();
-        captcha.outputCaptcha(output);
+        captcha.write(output);
     }
 
     @MAPPING(path = "/main.jsp",permissions = "ADMIN")

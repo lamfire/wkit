@@ -179,7 +179,7 @@ public class FilterDispatcher implements Filter {
 		boolean success = true;
 
 		//create action context
-		ActionContext actionContext = dispatcher.createActionContext(request, response, getServletContext());
+		ActionContext actionContext = dispatcher.createActionContext(request, response, getServletContext(),filterConfig);
 
 		try {
 			service(request,response,chain,actionContext);

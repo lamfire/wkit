@@ -9,11 +9,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.servlet.FilterConfig;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
@@ -27,8 +29,8 @@ public class ActionContext implements Serializable {
 
 	static final ThreadLocal<ActionContext> actionContext = new ThreadLocal<ActionContext>();
 
-	protected static synchronized ActionContext createActionContext(ServletContext context, HttpServletRequest request, HttpServletResponse response) {
-		ActionContext ac = new ActionContext(context, request, response);
+	protected static synchronized ActionContext createActionContext(ServletContext context, HttpServletRequest request, HttpServletResponse response,FilterConfig initConfig) {
+		ActionContext ac = new ActionContext(context, request, response,initConfig);
 		actionContext.set(ac);
 		return ac;
 	}
@@ -51,6 +53,7 @@ public class ActionContext implements Serializable {
 	protected HttpServletRequest request;
 	protected HttpServletResponse response;
 	protected ServletContext context;
+	private FilterConfig initConfig;
 
 	public String getRemoteAddress() {
 		return this.request.getRemoteAddr();
@@ -68,10 +71,11 @@ public class ActionContext implements Serializable {
 		return this.context;
 	}
 
-	private ActionContext(ServletContext context, HttpServletRequest request, HttpServletResponse response) {
+	private ActionContext(ServletContext context, HttpServletRequest request, HttpServletResponse response,FilterConfig initConfig) {
 		this.request = request;
 		this.response = response;
 		this.context = context;
+		this.initConfig = initConfig;
 	}
 
 	public OutputStream getOutputStream() throws IOException {
@@ -253,5 +257,13 @@ public class ActionContext implements Serializable {
 
 	public UserPrincipal getUserPrincipal(){
 		return (UserPrincipal)getSession().get(USER_PRINCIPAL_IN_SESSION);
+	}
+
+	public String getInitParameter(String name){
+		return initConfig.getInitParameter(name);
+	}
+
+	public Enumeration getInitParameterNames(){
+		return initConfig.getInitParameterNames();
 	}
 }

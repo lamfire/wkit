@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 
+import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,8 +42,8 @@ final class Dispatcher {
 		return actionContextInstance.get();
 	}
 
-    static synchronized ActionContext createActionContext(HttpServletRequest request, HttpServletResponse response, ServletContext context) {
-		ActionContext ac = ActionContext.createActionContext(context, request, response);
+    static synchronized ActionContext createActionContext(HttpServletRequest request, HttpServletResponse response, ServletContext context,FilterConfig initConfig) {
+		ActionContext ac = ActionContext.createActionContext(context, request, response,initConfig);
 		setActionContext(ac);
 		return ac;
 	}
