@@ -62,7 +62,7 @@ public class ActionRegistry {
         if(ErrorListener.class.isAssignableFrom(actionClass)){
             try {
                 this.errorListener = (ErrorListener) actionClass.newInstance();
-                LOGGER.info("[ERROR_ACTION] : " + actionClass.getName());
+                LOGGER.info("[ERROR_LISTENER] : " + actionClass.getName());
             }catch (Exception e){
                 LOGGER.warn(e.getMessage(),e);
             }

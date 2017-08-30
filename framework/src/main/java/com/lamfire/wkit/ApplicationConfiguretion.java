@@ -23,7 +23,12 @@ final class ApplicationConfiguretion {
 	}
 
 	private static Config parserConfig() {
-		Map<String, String> prop = PropertiesUtils.loadAsMap(CONF_FILE, ApplicationConfiguretion.class);
+		Map<String, String> prop = null;
+		try {
+			prop = PropertiesUtils.loadAsMap(CONF_FILE, ApplicationConfiguretion.class);
+		}catch (Exception e){
+			throw new RuntimeException("The application can not load config file:" + CONF_FILE);
+		}
 		LOGGER.info("found properties : " + prop);
 
 		String actionRoot = prop.get(PACKAGE_ROOT);
@@ -31,7 +36,7 @@ final class ApplicationConfiguretion {
 		String maxSize = prop.get(MULTIPART_LIMIT);
 
 		if (StringUtils.isBlank(actionRoot)) {
-			throw new RuntimeException("The application can not load config file:" + CONF_FILE);
+			throw new RuntimeException("The configure item 'package.root' not found.");
 		}
 
 		Config conf = new Config();
