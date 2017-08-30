@@ -5,8 +5,8 @@ import com.lamfire.utils.ClassLoaderUtils;
 import com.lamfire.utils.ClassUtils;
 import com.lamfire.utils.StringUtils;
 import com.lamfire.wkit.action.Action;
-import com.lamfire.wkit.action.ErrorAction;
-import com.lamfire.wkit.action.ErrorActionSupport;
+import com.lamfire.wkit.action.ErrorListener;
+import com.lamfire.wkit.action.ErrorListenerSupport;
 import com.lamfire.wkit.anno.ACTION;
 import com.lamfire.wkit.anno.MAPPING;
 
@@ -21,13 +21,12 @@ import java.util.Set;
  * User: linfan
  * Date: 16-4-18
  * Time: 下午5:05
- * To change this template use File | Settings | File Templates.
  */
 public class ActionRegistry {
     private static final Logger LOGGER = Logger.getLogger(ActionRegistry.class);
     private final Map<String, ActionMapper> mappers = new HashMap<String, ActionMapper>();
 
-    private ErrorAction errorAction = new ErrorActionSupport();
+    private ErrorListener errorListener = new ErrorListenerSupport();
 
     private static final ActionRegistry  instance = new ActionRegistry();
 
@@ -60,9 +59,9 @@ public class ActionRegistry {
             return;
         }
 
-        if(ErrorAction.class.isAssignableFrom(actionClass)){
+        if(ErrorListener.class.isAssignableFrom(actionClass)){
             try {
-                this.errorAction = (ErrorAction) actionClass.newInstance();
+                this.errorListener = (ErrorListener) actionClass.newInstance();
                 LOGGER.info("[ERROR_ACTION] : " + actionClass.getName());
             }catch (Exception e){
                 LOGGER.warn(e.getMessage(),e);
@@ -136,7 +135,7 @@ public class ActionRegistry {
         return mappers.get(servletName);
     }
 
-    public ErrorAction getErrorAction() {
-        return errorAction;
+    public ErrorListener getErrorListener() {
+        return errorListener;
     }
 }

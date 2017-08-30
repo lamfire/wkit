@@ -12,8 +12,7 @@ final class ApplicationConfiguretion {
 	static final Logger LOGGER = Logger.getLogger(ApplicationConfiguretion.class);
 
 	private static final String CONF_FILE = "application.properties";
-
-	public static final String ACTION_ROOT = "action.root"; 
+	public static final String PACKAGE_ROOT = "package.root";
 	public static final String MULTIPART_TEMPDIR = "multipart.tempdir"; 
 	public static final String MULTIPART_LIMIT = "multipart.limit";
 
@@ -27,7 +26,7 @@ final class ApplicationConfiguretion {
 		Map<String, String> prop = PropertiesUtils.loadAsMap(CONF_FILE, ApplicationConfiguretion.class);
 		LOGGER.info("found properties : " + prop);
 
-		String actionRoot = prop.get(ACTION_ROOT);
+		String actionRoot = prop.get(PACKAGE_ROOT);
 		String tempDir = prop.get(MULTIPART_TEMPDIR);
 		String maxSize = prop.get(MULTIPART_LIMIT);
 
@@ -36,7 +35,7 @@ final class ApplicationConfiguretion {
 		}
 
 		Config conf = new Config();
-		conf.setActionRoot(actionRoot.trim());
+		conf.setPackageRoot(actionRoot.trim());
 
 		if (StringUtils.isNotBlank(maxSize)) {
 			try {
@@ -56,7 +55,7 @@ final class ApplicationConfiguretion {
 	}
 
 	private static Config parserConfig(FilterConfig filterConfig) {
-		String actionRoot = filterConfig.getInitParameter(ACTION_ROOT);
+		String actionRoot = filterConfig.getInitParameter(PACKAGE_ROOT);
 		String tempDir = filterConfig.getInitParameter(MULTIPART_TEMPDIR);
 		String maxSize = filterConfig.getInitParameter(MULTIPART_LIMIT);
 
@@ -65,7 +64,7 @@ final class ApplicationConfiguretion {
 		}
 
 		Config conf = new Config();
-		conf.setActionRoot(actionRoot.trim());
+		conf.setPackageRoot(actionRoot.trim());
 
 		if (StringUtils.isNotBlank(maxSize)) {
 			try {

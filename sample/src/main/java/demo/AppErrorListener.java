@@ -1,8 +1,8 @@
-package demo.action;
+package demo;
 
 import com.lamfire.wkit.ActionContext;
 import com.lamfire.wkit.UserPrincipal;
-import com.lamfire.wkit.action.ErrorActionSupport;
+import com.lamfire.wkit.action.ErrorListenerSupport;
 import com.lamfire.wkit.anno.ACTION;
 
 import javax.servlet.http.HttpServletRequest;
@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Set;
 
 @ACTION
-public class AppErrorAction extends ErrorActionSupport {
+public class AppErrorListener extends ErrorListenerSupport {
 
     @Override
     public void onPermissionDenied(ActionContext context, HttpServletRequest request, HttpServletResponse response, UserPrincipal user, Set<String> permissions) {

@@ -1,8 +1,7 @@
 package com.lamfire.wkit;
 
 import com.lamfire.logger.Logger;
-import com.lamfire.wkit.action.ErrorAction;
-import com.lamfire.wkit.action.ErrorActionSupport;
+import com.lamfire.wkit.action.ErrorListener;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -172,7 +171,7 @@ public class ActionContext implements Serializable {
 	}
 
 	void handlePermissionDenied(Set<String> permissions){
-		ErrorAction error = ActionRegistry.getInstance().getErrorAction();
+		ErrorListener error = ActionRegistry.getInstance().getErrorListener();
 		if(error == null){
 			return;
 		}
@@ -180,7 +179,7 @@ public class ActionContext implements Serializable {
 	}
 
 	void handleActionException(Exception e){
-		ErrorAction error = ActionRegistry.getInstance().getErrorAction();
+		ErrorListener error = ActionRegistry.getInstance().getErrorListener();
 		if(error == null){
 			return;
 		}
@@ -188,7 +187,7 @@ public class ActionContext implements Serializable {
 	}
 
 	void handleNotAuthorized(){
-		ErrorAction error = ActionRegistry.getInstance().getErrorAction();
+		ErrorListener error = ActionRegistry.getInstance().getErrorListener();
 		if(error == null){
 			return;
 		}

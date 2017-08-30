@@ -274,7 +274,7 @@ public class FilterDispatcher implements Filter {
 		Dispatcher.setInstance(this.dispatcher);
 		
 		//mapping package
-        ActionRegistry.getInstance().registerAll(appConfig.getActionRoot());
+        ActionRegistry.getInstance().registerAll(appConfig.getPackageRoot());
 	}
 
 	public ServletContext getServletContext() {

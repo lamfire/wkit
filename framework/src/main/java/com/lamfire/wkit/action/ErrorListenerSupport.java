@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Set;
 
-public class ErrorActionSupport implements ErrorAction {
+public class ErrorListenerSupport implements ErrorListener {
 
     public void onPermissionDenied(ActionContext context, HttpServletRequest request , HttpServletResponse response, UserPrincipal user,Set<String> permissions){
         writeResponse(response,HttpErrorTemplate.getPermissionDeniedTemplate(request.getServletPath(),permissions));

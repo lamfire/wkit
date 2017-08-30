@@ -10,7 +10,7 @@
 			<param-value>UTF-8</param-value>
 		</init-param>
 		<init-param>
-			<param-name>action.root</param-name>
+			<param-name>package.root</param-name>
 			<param-value>demo.action</param-value>
 		</init-param>
 		<init-param>
