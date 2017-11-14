@@ -239,18 +239,18 @@ public class ActionContext implements Serializable {
 		return context.getResourceAsStream("/WEB-INF/classes/" + name);
 	}
 
-	public void login(String username, Collection<String> permissions){
+	public void authorize(String username, Collection<String> permissions){
 		UserPrincipal principal = new UserPrincipal();
 		principal.setName(username);
 		principal.addPermissions(permissions);
-		login(principal);
+		authorize(principal);
 	}
 
-	public void login(UserPrincipal principal){
+	public void authorize(UserPrincipal principal){
 		getSession().put(USER_PRINCIPAL_IN_SESSION,principal);
 	}
 
-	public void logout(){
+	public void unauthorize(){
 		getSession().clear();
 	}
 
