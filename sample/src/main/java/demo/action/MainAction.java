@@ -53,7 +53,7 @@ public class MainAction extends ActionSupport {
         }
 
         if(StringUtils.equals(username,password)){
-            getActionContext().login(user);
+            getActionContext().authorize(user);
             return redirect("/main.jsp");
         }
 
@@ -64,7 +64,7 @@ public class MainAction extends ActionSupport {
 
     @MAPPING(path = "/logout")
     public ActionForward logout(ActionContext context) {
-        context.logout();
+        context.unauthorize();
         return redirect("/login.jsp");
     }
 
