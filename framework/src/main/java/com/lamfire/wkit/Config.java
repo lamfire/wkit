@@ -5,16 +5,16 @@ class Config{
 	public static final long DEFAULT_MULTIPART_LIMIT = 1024 * 1024;
 	public static final String DEFAULT_MULTIPART_TEMPDIR = System.getProperty("java.io.tmpdir");
 	
-	private String packageRoot;
+	private String mappingPackage;
 	private String multipartTempDir = DEFAULT_MULTIPART_TEMPDIR;
 	private long multipartLimit = DEFAULT_MULTIPART_LIMIT;
 
 	
-	public String getPackageRoot() {
-		return packageRoot;
+	public String getMappingPackage() {
+		return mappingPackage;
 	}
-	public void setPackageRoot(String packageRoot) {
-		this.packageRoot = packageRoot;
+	public void setMappingPackage(String mappingPackage) {
+		this.mappingPackage = mappingPackage;
 	}
 	public String getMultipartTempDir() {
 		return multipartTempDir;

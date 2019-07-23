@@ -12,7 +12,7 @@ final class ApplicationConfiguretion {
 	static final Logger LOGGER = Logger.getLogger(ApplicationConfiguretion.class);
 
 	private static final String CONF_FILE = "application.properties";
-	public static final String PACKAGE_ROOT = "package.root";
+	public static final String MAPPING_PACKAGE = "mapping.package";
 	public static final String MULTIPART_TEMPDIR = "multipart.tempdir"; 
 	public static final String MULTIPART_LIMIT = "multipart.limit";
 
@@ -22,7 +22,7 @@ final class ApplicationConfiguretion {
 	private ApplicationConfiguretion() {
 	}
 
-	private static Config parserConfig() {
+	private static Config parseConfig() {
 		Map<String, String> prop = null;
 		try {
 			prop = PropertiesUtils.loadAsMap(CONF_FILE, ApplicationConfiguretion.class);
@@ -30,17 +30,18 @@ final class ApplicationConfiguretion {
 			throw new RuntimeException("The application can not load config file:" + CONF_FILE);
 		}
 		LOGGER.info("found properties : " + prop);
+		LOGGER.info("Parse Config from "+CONF_FILE);
 
-		String actionRoot = prop.get(PACKAGE_ROOT);
+		String mappingPackage = prop.get(MAPPING_PACKAGE);
 		String tempDir = prop.get(MULTIPART_TEMPDIR);
 		String maxSize = prop.get(MULTIPART_LIMIT);
 
-		if (StringUtils.isBlank(actionRoot)) {
+		if (StringUtils.isBlank(mappingPackage)) {
 			throw new RuntimeException("The configure item 'package.root' not found.");
 		}
 
 		Config conf = new Config();
-		conf.setPackageRoot(actionRoot.trim());
+		conf.setMappingPackage(mappingPackage.trim());
 
 		if (StringUtils.isNotBlank(maxSize)) {
 			try {
@@ -59,17 +60,20 @@ final class ApplicationConfiguretion {
 
 	}
 
-	private static Config parserConfig(FilterConfig filterConfig) {
-		String actionRoot = filterConfig.getInitParameter(PACKAGE_ROOT);
+	private static Config parseConfig(FilterConfig filterConfig) {
+		String mappingPackage = filterConfig.getInitParameter(MAPPING_PACKAGE);
 		String tempDir = filterConfig.getInitParameter(MULTIPART_TEMPDIR);
 		String maxSize = filterConfig.getInitParameter(MULTIPART_LIMIT);
 
-		if (StringUtils.isBlank(actionRoot)) {
+		LOGGER.info("Parse Config from FilterConfig");
+
+		if (StringUtils.isBlank(mappingPackage)) {
+			LOGGER.error("Not found '"+MAPPING_PACKAGE+"' from web.xml");
 			return null;
 		}
 
 		Config conf = new Config();
-		conf.setPackageRoot(actionRoot.trim());
+		conf.setMappingPackage(mappingPackage.trim());
 
 		if (StringUtils.isNotBlank(maxSize)) {
 			try {
@@ -97,12 +101,15 @@ final class ApplicationConfiguretion {
 		if (conf != null) {
 			return conf;
 		}
+
+		//parse from filter config
 		if (conf == null) {
-			conf = parserConfig(filterConfig);
+			conf = parseConfig(filterConfig);
 		}
 
+		//parse from application.properties
 		if (conf == null) {
-			conf = parserConfig();
+			conf = parseConfig();
 		}
 
 		return conf;
