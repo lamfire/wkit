@@ -37,12 +37,6 @@ public class MainAction extends ActionSupport {
        return forward("/main.jsp");
     }
 
-    @MAPPING(path = "/main.jsp",permissions = "ADMIN")
-    public ActionForward main1(JSON json){
-        System.out.println(json);
-        return forward("/main.jsp");
-    }
-
     @MAPPING(path = "/login")
     public ActionForward login(@PARAM(value = "username") String username, @PARAM(value = "password")String password) {
         UserPrincipal user = new UserPrincipal();
